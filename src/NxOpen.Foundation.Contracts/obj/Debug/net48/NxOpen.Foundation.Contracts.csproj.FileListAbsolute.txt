@@ -1,0 +1,9 @@
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\bin\Debug\net48\NxOpen.Foundation.Contracts.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\bin\Debug\net48\NxOpen.Foundation.Contracts.pdb
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.csproj.AssemblyReference.cache
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.AssemblyInfoInputs.cache
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.AssemblyInfo.cs
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.csproj.CoreCompileInputs.cache
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.pdb
