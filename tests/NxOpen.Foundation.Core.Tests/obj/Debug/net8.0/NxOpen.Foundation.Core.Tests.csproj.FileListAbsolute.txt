@@ -104,3 +104,4 @@ C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Core.Test
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Core.Tests\obj\Debug\net8.0\NxOpen.Foundation.Core.Tests.pdb
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Core.Tests\obj\Debug\net8.0\NxOpen.Foundation.Core.Tests.genruntimeconfig.cache
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Core.Tests\obj\Debug\net8.0\ref\NxOpen.Foundation.Core.Tests.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Core.Tests\obj\Debug\net8.0\NxOpen.Foundation.Core.Tests.sourcelink.json

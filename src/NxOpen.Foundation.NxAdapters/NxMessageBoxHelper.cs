@@ -1,5 +1,5 @@
 using NXOpen;
-using NXOpen.Foundation.Contracts.Common;
+using NxOpen.Foundation.Contracts.Common;
 
 namespace NxOpen.Foundation.NxAdapters;
 
@@ -8,10 +8,12 @@ namespace NxOpen.Foundation.NxAdapters;
 /// particular dialog's blocks or domain types.</summary>
 public static class NxMessageBoxHelper
 {
-    // VERIFY: exact NXMessageBox.Show return type/values for a Yes/No dialog — "== 1 means Yes" is a
-    // best-effort guess, not confirmed against the installed NX version.
+    // DialogType has exactly four members in NX 2412 — Error, Warning, Information, Question — so there is
+    // no QuestionYesNo (the previous guess). Question is the yes/no dialog, and Show returns an int.
+    //
+    // VERIFY: that the int is 1 for Yes. The return type is confirmed; the meaning of the value is not.
     public static bool Confirm(string message) =>
-        UI.GetUI().NXMessageBox.Show("Confirm", NXMessageBox.DialogType.QuestionYesNo, message) == 1;
+        UI.GetUI().NXMessageBox.Show("Confirm", NXMessageBox.DialogType.Question, message) == 1;
 
     public static void ShowResult(OperationResult result, string successMessage)
     {

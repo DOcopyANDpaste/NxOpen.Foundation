@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NxOpen.Foundation.Contracts.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78ea7da42fc2c28bca64fce01b454181020351fd")]
 [assembly: System.Reflection.AssemblyProductAttribute("NxOpen.Foundation.Contracts.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NxOpen.Foundation.Contracts.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

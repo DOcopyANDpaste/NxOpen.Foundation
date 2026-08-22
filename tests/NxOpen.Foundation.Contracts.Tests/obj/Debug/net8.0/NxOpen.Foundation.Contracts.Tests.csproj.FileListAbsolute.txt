@@ -100,3 +100,4 @@ C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Contracts
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Contracts.Tests\obj\Debug\net8.0\NxOpen.Foundation.Contracts.Tests.pdb
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Contracts.Tests\obj\Debug\net8.0\NxOpen.Foundation.Contracts.Tests.genruntimeconfig.cache
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Contracts.Tests\obj\Debug\net8.0\ref\NxOpen.Foundation.Contracts.Tests.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\tests\NxOpen.Foundation.Contracts.Tests\obj\Debug\net8.0\NxOpen.Foundation.Contracts.Tests.sourcelink.json

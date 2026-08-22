@@ -1,0 +1,15 @@
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.csproj.AssemblyReference.cache
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.AssemblyInfoInputs.cache
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.AssemblyInfo.cs
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.csproj.CoreCompileInputs.cache
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.sourcelink.json
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\bin\Debug\net48\NxOpen.Foundation.NxAdapters.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\bin\Debug\net48\NxOpen.Foundation.NxAdapters.pdb
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\bin\Debug\net48\NxOpen.Foundation.Contracts.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\bin\Debug\net48\NxOpen.Foundation.Core.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\bin\Debug\net48\NxOpen.Foundation.Contracts.pdb
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\bin\Debug\net48\NxOpen.Foundation.Core.pdb
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.F.43869AF5.Up2Date
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.NxAdapters\obj\Debug\net48\NxOpen.Foundation.NxAdapters.pdb

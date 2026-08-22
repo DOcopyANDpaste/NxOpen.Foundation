@@ -13,3 +13,4 @@ C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\De
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net8.0\refint\NxOpen.Foundation.Core.dll
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net8.0\NxOpen.Foundation.Core.pdb
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net8.0\ref\NxOpen.Foundation.Core.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net8.0\NxOpen.Foundation.Core.sourcelink.json

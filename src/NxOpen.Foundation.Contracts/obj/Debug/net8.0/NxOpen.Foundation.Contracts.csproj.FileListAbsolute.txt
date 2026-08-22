@@ -9,3 +9,4 @@ C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\o
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net8.0\refint\NxOpen.Foundation.Contracts.dll
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net8.0\NxOpen.Foundation.Contracts.pdb
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net8.0\ref\NxOpen.Foundation.Contracts.dll
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net8.0\NxOpen.Foundation.Contracts.sourcelink.json

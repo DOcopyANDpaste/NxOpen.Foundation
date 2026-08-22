@@ -7,3 +7,4 @@ C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\o
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.csproj.CoreCompileInputs.cache
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.dll
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.pdb
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Contracts\obj\Debug\net48\NxOpen.Foundation.Contracts.sourcelink.json

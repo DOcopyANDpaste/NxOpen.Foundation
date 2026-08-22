@@ -1,0 +1,109 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.8": {
+      "NxOpen.Foundation.Contracts/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.8",
+        "compile": {
+          "bin/placeholder/NxOpen.Foundation.Contracts.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NxOpen.Foundation.Contracts.dll": {}
+        }
+      },
+      "NxOpen.Foundation.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.8",
+        "dependencies": {
+          "NxOpen.Foundation.Contracts": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/NxOpen.Foundation.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NxOpen.Foundation.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "NxOpen.Foundation.Contracts/1.0.0": {
+      "type": "project",
+      "path": "../NxOpen.Foundation.Contracts/NxOpen.Foundation.Contracts.csproj",
+      "msbuildProject": "../NxOpen.Foundation.Contracts/NxOpen.Foundation.Contracts.csproj"
+    },
+    "NxOpen.Foundation.Core/1.0.0": {
+      "type": "project",
+      "path": "../NxOpen.Foundation.Core/NxOpen.Foundation.Core.csproj",
+      "msbuildProject": "../NxOpen.Foundation.Core/NxOpen.Foundation.Core.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.8": [
+      "NxOpen.Foundation.Contracts >= 1.0.0",
+      "NxOpen.Foundation.Core >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\CYRNBB\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\CYRNBB\\source\\repos\\NxOpen.Foundation\\src\\NxOpen.Foundation.NxAdapters\\NxOpen.Foundation.NxAdapters.csproj",
+      "projectName": "NxOpen.Foundation.NxAdapters",
+      "projectPath": "C:\\Users\\CYRNBB\\source\\repos\\NxOpen.Foundation\\src\\NxOpen.Foundation.NxAdapters\\NxOpen.Foundation.NxAdapters.csproj",
+      "packagesPath": "C:\\Users\\CYRNBB\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\CYRNBB\\source\\repos\\NxOpen.Foundation\\src\\NxOpen.Foundation.NxAdapters\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\CYRNBB\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net48"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net48": {
+          "targetAlias": "net48",
+          "projectReferences": {
+            "C:\\Users\\CYRNBB\\source\\repos\\NxOpen.Foundation\\src\\NxOpen.Foundation.Contracts\\NxOpen.Foundation.Contracts.csproj": {
+              "projectPath": "C:\\Users\\CYRNBB\\source\\repos\\NxOpen.Foundation\\src\\NxOpen.Foundation.Contracts\\NxOpen.Foundation.Contracts.csproj"
+            },
+            "C:\\Users\\CYRNBB\\source\\repos\\NxOpen.Foundation\\src\\NxOpen.Foundation.Core\\NxOpen.Foundation.Core.csproj": {
+              "projectPath": "C:\\Users\\CYRNBB\\source\\repos\\NxOpen.Foundation\\src\\NxOpen.Foundation.Core\\NxOpen.Foundation.Core.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.200"
+    },
+    "frameworks": {
+      "net48": {
+        "targetAlias": "net48",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using NXOpen;
 using NXOpen.UF;
 
@@ -42,7 +43,9 @@ public sealed class NxSessionContext
         Log = log;
     }
 
-    public static bool TryInitialize(out NxSessionContext? context, out string? failureReason)
+    public static bool TryInitialize(
+        [NotNullWhen(true)] out NxSessionContext? context,
+        [NotNullWhen(false)] out string? failureReason)
     {
         context = null;
         failureReason = null;
@@ -67,7 +70,7 @@ public sealed class NxSessionContext
             }
 
             var ufSession = UFSession.GetUFSession();
-            var mode = DetectSessionMode(session);
+            var mode = DetectSessionMode(ufSession);
             var log = new NxListingLog(session);
 
             context = new NxSessionContext(session, UI.GetUI(), workPart, ufSession, mode, log);
@@ -80,10 +83,12 @@ public sealed class NxSessionContext
         }
     }
 
-    // NOTE: best-effort / UNVERIFIED against a real NX Open API reference — there is no NX installation
-    // on the machine this was written on. Candidates to check for the real Teamcenter-managed-session
-    // detection call: a property/method on Session itself (e.g. something like IsTeamcenterUsed), or a
-    // UFSession product-structure (UF_PS_*) query. Confirm and correct before relying on this.
-    private static NxSessionMode DetectSessionMode(Session session) =>
-        session.IsTeamcenterUsed ? NxSessionMode.TeamcenterManaged : NxSessionMode.Native;
+    // Verified against NX 2412: there is no such thing as Session.IsTeamcenterUsed (the previous guess).
+    // UF_is_ugmanager_active — surfaced in .NET as UFSession.UF.IsUgmanagerActive — is the real query, and
+    // "UG Manager active" is precisely what a Teamcenter-managed session means.
+    private static NxSessionMode DetectSessionMode(UFSession ufSession)
+    {
+        ufSession.UF.IsUgmanagerActive(out var isManaged);
+        return isManaged ? NxSessionMode.TeamcenterManaged : NxSessionMode.Native;
+    }
 }

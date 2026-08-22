@@ -7,6 +7,16 @@
     `dotnet build`/`dotnet test` on the .sln intentionally do not touch this project.
   -->
 
+  <!--
+    This project builds first when a consumer references it, so the guard has to live here too — without
+    it, a build without NX fails as dozens of CS0246 "type or namespace 'NXOpen' not found" errors from
+    this project's own sources, burying the actual cause.
+  -->
+  <Target Name="RequireUgiiBaseDir" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="'$(UGII_BASE_DIR)' == ''"
+           Text="UGII_BASE_DIR is not set. This project references the NXOpen managed assemblies and can only be built on a machine with NX installed." />
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="..\NxOpen.Foundation.Contracts\NxOpen.Foundation.Contracts.csproj" />
     <ProjectReference Include="..\NxOpen.Foundation.Core\NxOpen.Foundation.Core.csproj" />
@@ -21,16 +31,34 @@
 
   <!--
     Per Skills/common.md non-negotiable #4: no hardcoded install paths, reference via UGII_BASE_DIR.
-    Managed-assembly folder name/layout ("managed\NXOpen.dll", "managed\NXOpen.UF.dll") mirrors this
-    repo's NxAdapters.csproj — NOT verified against a real install.
+    Verified against NX 2412: the managed assemblies live in NXBIN\managed (net48), NOT directly under
+    $(UGII_BASE_DIR)\managed as previously assumed. NXBIN\managed_core is the .NET-Core-targeted copy —
+    this project is net48, so it wants the former.
   -->
+  <PropertyGroup>
+    <NxManagedDir>$(UGII_BASE_DIR)\NXBIN\managed</NxManagedDir>
+  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="NXOpen">
-      <HintPath>$(UGII_BASE_DIR)\managed\NXOpen.dll</HintPath>
+      <HintPath>$(NxManagedDir)\NXOpen.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="NXOpen.UF">
-      <HintPath>$(UGII_BASE_DIR)\managed\NXOpen.UF.dll</HintPath>
+      <HintPath>$(NxManagedDir)\NXOpen.UF.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- NXOpen.TaggedObject and the NXRemotableObject base live here, not in NXOpen.dll. -->
+    <Reference Include="NXOpen.Utilities">
+      <HintPath>$(NxManagedDir)\NXOpen.Utilities.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!--
+      NXOpen.UI and NXOpen.NXMessageBox ship in NXOpenUI.dll, not NXOpen.dll — verified against NX 2412.
+      NxSessionContext and NxMessageBoxHelper both depend on them.
+    -->
+    <Reference Include="NXOpenUI">
+      <HintPath>$(NxManagedDir)\NXOpenUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

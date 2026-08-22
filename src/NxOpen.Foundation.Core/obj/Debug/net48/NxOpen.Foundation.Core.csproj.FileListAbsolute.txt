@@ -10,3 +10,4 @@ C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\De
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net48\NxOpen.F.326C1E79.Up2Date
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net48\NxOpen.Foundation.Core.dll
 C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net48\NxOpen.Foundation.Core.pdb
+C:\Users\CYRNBB\source\repos\NxOpen.Foundation\src\NxOpen.Foundation.Core\obj\Debug\net48\NxOpen.Foundation.Core.sourcelink.json
