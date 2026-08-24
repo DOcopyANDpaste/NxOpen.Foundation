@@ -47,11 +47,12 @@ public sealed class MaterialLibraryParser : IMaterialLibraryParser
         var rawId = (string?)materialElement.Attribute("id");
         var materialId = new MaterialId(rawId ?? $"{libraryId.Value}:{index}");
 
-        var classId = (string?)bulk.Element("Class")?.Attribute("ID")
-            ?? (string?)bulk.Element("Class")?.Attribute("idref");
+        var classElement = bulk.Element("Class");
+        var classId = (string?)classElement?.Attribute("ID")
+            ?? (string?)classElement?.Attribute("idref");
         var category = classId is not null && categories.TryGetValue(classId, out var matchedCategory)
             ? matchedCategory
-            : MaterialCategory.Uncategorized;
+            : BuildInlineCategory(classElement) ?? MaterialCategory.Uncategorized;
 
         var propertyValues = bulk.Elements("PropertyData")
             .Select(propertyData => ParsePropertyValue(propertyData, propertyDetails))
@@ -70,6 +71,19 @@ public sealed class MaterialLibraryParser : IMaterialLibraryParser
             category,
             propertyValues,
             string.IsNullOrEmpty(description) ? null : description);
+    }
+
+    /// <summary>Some NX exports give a class inline (<c>&lt;Class&gt;&lt;Name&gt;...&lt;/Name&gt;&lt;/Class&gt;</c>)
+    /// rather than as an ID/idref into Metadata/ClassDetails. When there's no registry match, fall back to
+    /// building a category straight from that inline name so the material isn't silently dumped into
+    /// "Uncategorized".</summary>
+    private static MaterialCategory? BuildInlineCategory(XElement? classElement)
+    {
+        var rawName = classElement?.Element("Name")?.Value?.Trim();
+        if (rawName is null || rawName.Length == 0)
+            return null;
+
+        return new MaterialCategory(rawName.ToLowerInvariant(), rawName, [rawName]);
     }
 
     private static MaterialPropertyValue? ParsePropertyValue(

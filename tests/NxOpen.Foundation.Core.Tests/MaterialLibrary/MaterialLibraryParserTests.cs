@@ -63,6 +63,37 @@ public class MaterialLibraryParserTests
     }
 
     [Fact]
+    public void Parse_UsesInlineClassNameWhenNoRegistryMatch()
+    {
+        // Real NX exports have been seen to give the class inline (no Metadata/ClassDetails registry,
+        // no ID/idref) rather than through the generic MatML registry-lookup shape the rest of this
+        // fixture set targets.
+        const string xml = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <MatML_Doc>
+              <Material>
+                <BulkDetails>
+                  <Name>TestMaterial</Name>
+                  <Class>
+                    <Name>Testing Only Material</Name>
+                  </Class>
+                  <PropertyData property="Density">
+                    <Data format="exponential">0.000000e+00</Data>
+                  </PropertyData>
+                </BulkDetails>
+              </Material>
+            </MatML_Doc>
+            """;
+
+        var parser = new MaterialLibraryParser();
+        var library = parser.Parse(new MaterialLibraryId("inline"), "Inline Library", xml);
+
+        var material = library.Materials.Single();
+        Assert.Equal("Testing Only Material", material.Category.DisplayName);
+        Assert.NotEqual(MaterialCategory.Uncategorized, material.Category);
+    }
+
+    [Fact]
     public void Parse_ReadsNumericPropertyValueWithUnitAndSymbol()
     {
         var library = ParseMetricFixture();

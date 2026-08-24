@@ -15,11 +15,11 @@ public sealed record MaterialPropertyValue(
     string RawValue,
     string? Unit)
 {
-    public string AsString() => RawValue;
+    public string AsString() => RawValue ?? string.Empty;
 
     /// <summary>Splits a comma-separated raw value into trimmed, non-empty entries.</summary>
     public IReadOnlyList<string> AsArray() =>
-        [.. RawValue.Split(',').Select(v => v.Trim()).Where(v => v.Length > 0)];
+        [.. AsString().Split(',').Select(v => v.Trim()).Where(v => v.Length > 0)];
 
     /// <summary>Parses the raw value as a single number; null if it isn't one (e.g. text or a
     /// comma-separated list).</summary>
