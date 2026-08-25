@@ -19,6 +19,11 @@ public sealed class UndoScope : IDisposable
 
     public UndoScope(Session session, string name, Action<string>? onRollbackFailed = null)
     {
+        // TEMP DIAGNOSTIC: turns a silent NRE at this line into an unambiguous signal of which of the two
+        // is actually null — remove once the "assign to selected bodies" NRE is root-caused.
+        if (session is null)
+            throw new ArgumentNullException(nameof(session), "UndoScope constructed with a null Session.");
+
         _session = session;
         _name = name;
         _onRollbackFailed = onRollbackFailed;

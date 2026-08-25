@@ -26,7 +26,7 @@ public sealed class CachingMaterialLibraryLoader : IMaterialLibraryLoader
             return cached;
 
         var xmlContent = _repository.ReadLibraryXml(reference.Id);
-        var library = _parser.Parse(reference.Id, reference.DisplayName, xmlContent);
+        var library = _parser.Parse(reference.Id, reference.DisplayName, xmlContent) with { FilePath = reference.FilePath };
         _cache[reference.Id] = library;
         return library;
     }
