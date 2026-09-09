@@ -1,10 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    NOT added to BANxOpen.Foundation.sln — references real NXOpen/UFSession assemblies that only resolve
-    on a machine with NX installed (UGII_BASE_DIR set), exactly mirroring this repo's own
-    NxAdapters.csproj convention. Add it to the solution once building on such a machine; until then
-    `dotnet build`/`dotnet test` on the .sln intentionally do not touch this project.
+    In BANxOpen.Foundation.sln so it loads in the IDE, but with an ActiveCfg entry and NO Build.0 entry in
+    any configuration: it references real NXOpen/UFSession assemblies that only resolve on a machine with
+    NX installed (UGII_BASE_DIR set). That arrangement is what keeps `dotnet build`/`dotnet test` on the
+    .sln working everywhere else. Build it explicitly on an NX machine:
+    `dotnet build src\BANxOpen.Foundation.NxAdapters\BANxOpen.Foundation.NxAdapters.csproj`.
+
+    Materials\ holds the NX side of the material engine: the IPartMaterialService implementation and the
+    physical/display material helpers it drives. It lives here rather than in a separate assembly so that
+    the number of DLLs deployed into NX does not grow, since every consumer already references this
+    project for NxSessionContext and UndoScope.
   -->
 
   <!--
@@ -20,6 +26,9 @@
   <ItemGroup>
     <ProjectReference Include="..\BANxOpen.Foundation.Contracts\BANxOpen.Foundation.Contracts.csproj" />
     <ProjectReference Include="..\BANxOpen.Foundation.Core\BANxOpen.Foundation.Core.csproj" />
+    <!-- Materials\PartMaterialService implements IPartMaterialService and executes the plan and
+         side-effect instruction types, all of which live in Core.Materials. -->
+    <ProjectReference Include="..\BANxOpen.Foundation.Core.Materials\BANxOpen.Foundation.Core.Materials.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

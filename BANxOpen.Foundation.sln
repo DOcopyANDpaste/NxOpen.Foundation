@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BANxOpen.Foundation.Core.Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BANxOpen.Foundation.Core.Materials.Tests", "tests\BANxOpen.Foundation.Core.Materials.Tests\BANxOpen.Foundation.Core.Materials.Tests.csproj", "{DDBA2B92-E8EF-4348-B182-E4FC0F0C1E08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BANxOpen.Foundation.NxAdapters", "src\BANxOpen.Foundation.NxAdapters\BANxOpen.Foundation.NxAdapters.csproj", "{CD8EB745-90E4-4379-842B-243678FEDE0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,12 @@ Global
 		{DDBA2B92-E8EF-4348-B182-E4FC0F0C1E08}.Release|x64.Build.0 = Release|Any CPU
 		{DDBA2B92-E8EF-4348-B182-E4FC0F0C1E08}.Release|x86.ActiveCfg = Release|Any CPU
 		{DDBA2B92-E8EF-4348-B182-E4FC0F0C1E08}.Release|x86.Build.0 = Release|Any CPU
+		{CD8EB745-90E4-4379-842B-243678FEDE0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8EB745-90E4-4379-842B-243678FEDE0E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CD8EB745-90E4-4379-842B-243678FEDE0E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CD8EB745-90E4-4379-842B-243678FEDE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD8EB745-90E4-4379-842B-243678FEDE0E}.Release|x64.ActiveCfg = Release|Any CPU
+		{CD8EB745-90E4-4379-842B-243678FEDE0E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,5 +120,6 @@ Global
 		{9BFDCB33-F17B-4957-86AC-99EA1CF7051F} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{8A2EC345-6DBA-4A7B-93B6-05429D250522} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{DDBA2B92-E8EF-4348-B182-E4FC0F0C1E08} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{CD8EB745-90E4-4379-842B-243678FEDE0E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal
