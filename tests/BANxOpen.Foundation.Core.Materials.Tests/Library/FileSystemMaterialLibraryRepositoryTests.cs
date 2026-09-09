@@ -1,7 +1,7 @@
 using BANxOpen.Foundation.Contracts.Common;
-using BANxOpen.Foundation.Core.MaterialLibrary;
+using BANxOpen.Foundation.Core.Materials.Library;
 
-namespace BANxOpen.Foundation.Core.Tests.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Tests.Library;
 
 public class FileSystemMaterialLibraryRepositoryTests : IDisposable
 {

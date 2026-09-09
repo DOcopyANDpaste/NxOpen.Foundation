@@ -2,7 +2,7 @@ using System.Xml.Linq;
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Library;
 
 /// <summary>Parses NX material library XML (generic MatML shape: Metadata/PropertyDetails +
 /// Metadata/ClassDetails + repeated Material/BulkDetails elements) into domain objects.

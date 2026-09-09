@@ -1,6 +1,6 @@
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Library;
 
 /// <summary>Loads a material library on demand (lazy — only the library the caller actually picks gets
 /// parsed) and caches the parsed result for the lifetime of this instance, so re-selecting a previously

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The material engine: library loading/parsing/caching, the assignment planner and finalizer, the
+    standard rule set, and the feature-constraint seam. Deliberately free of NXOpen so it targets
+    net8.0 as well as net48 and stays unit-testable on a machine without NX installed; every NX call
+    it needs arrives through IPartMaterialService, implemented in BANxOpen.Foundation.NxAdapters.
+
+    Split out of BANxOpen.Foundation.Core so that Core carries nothing but the rule engine: a tool
+    that wants the gate/effect pattern but never touches materials references Core alone.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\BANxOpen.Foundation.Contracts\BANxOpen.Foundation.Contracts.csproj" />
+    <ProjectReference Include="..\BANxOpen.Foundation.Core\BANxOpen.Foundation.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+  </PropertyGroup>
+
+</Project>

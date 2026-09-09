@@ -1,7 +1,7 @@
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Library;
 
 /// <summary>Reads (via <see cref="IMaterialLibraryRepository"/>, the adapter-implemented seam) and parses
 /// a library only the first time it's requested; every subsequent request for the same

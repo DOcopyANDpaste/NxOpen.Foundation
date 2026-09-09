@@ -1,0 +1,11 @@
+using BANxOpen.Foundation.Core.Materials.Bodies;
+using BANxOpen.Foundation.Contracts.Common;
+using BANxOpen.Foundation.Contracts.Materials;
+using BANxOpen.Foundation.Contracts.Bodies;
+
+namespace BANxOpen.Foundation.Core.Materials.Assignment;
+
+public sealed record MaterialAssignmentPlanningInput(
+    Material RequestedMaterial,
+    IReadOnlyList<BodyInfo> TargetBodies,
+    IReadOnlyDictionary<BodyId, BodyMaterialAssignment> CurrentAssignments);

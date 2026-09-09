@@ -1,7 +1,7 @@
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Library;
 
 /// <summary>Parses material library XML content into domain objects. Pure text-in, data-out — no file
 /// I/O, no NXOpen. The adapter layer reads the file and hands the content here.</summary>

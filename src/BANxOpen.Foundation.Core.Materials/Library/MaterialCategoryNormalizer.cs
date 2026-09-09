@@ -1,7 +1,7 @@
 using System.Xml.Linq;
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Library;
 
 /// <summary>Flattens a MatML Metadata/ClassDetails hierarchy (nested &lt;ClassDetails&gt; elements) into
 /// a lookup from class id to a normalized <see cref="MaterialCategory"/> carrying the full path from

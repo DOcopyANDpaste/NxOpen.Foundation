@@ -1,7 +1,7 @@
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Library;
 
 /// <summary>Pure file-system seam for material library discovery — no NXOpen types touched. Scans a
 /// root directory for *.xml files; one <see cref="MaterialLibraryReference"/> per file, keyed by

@@ -1,6 +1,6 @@
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.Tests.MaterialLibrary;
+namespace BANxOpen.Foundation.Core.Materials.Tests.Library;
 
 public class MaterialPropertyValueTests
 {
