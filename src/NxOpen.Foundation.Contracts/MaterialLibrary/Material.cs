@@ -9,4 +9,5 @@ public sealed record Material(
     MaterialCategory Category,
     IReadOnlyList<MaterialPropertyValue> Properties,
     string? Description = null,
-    (byte R, byte G, byte B)? AppearanceColor = null);
+    (byte R, byte G, byte B)? AppearanceColor = null,
+    string? ImagePath = null);

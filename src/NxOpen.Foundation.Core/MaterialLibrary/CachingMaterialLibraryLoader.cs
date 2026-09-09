@@ -26,8 +26,21 @@ public sealed class CachingMaterialLibraryLoader : IMaterialLibraryLoader
             return cached;
 
         var xmlContent = _repository.ReadLibraryXml(reference.Id);
-        var library = _parser.Parse(reference.Id, reference.DisplayName, xmlContent) with { FilePath = reference.FilePath };
+        var parsed = _parser.Parse(reference.Id, reference.DisplayName, xmlContent);
+
+        var bmpDirectory = Path.Combine(Path.GetDirectoryName(reference.FilePath) ?? string.Empty, "BMPs");
+        var materials = parsed.Materials
+            .Select(material => material with { ImagePath = ResolveImagePath(bmpDirectory, material.Name) })
+            .ToList();
+
+        var library = parsed with { FilePath = reference.FilePath, Materials = materials };
         _cache[reference.Id] = library;
         return library;
+    }
+
+    private static string ResolveImagePath(string bmpDirectory, string materialName)
+    {
+        var candidate = Path.Combine(bmpDirectory, $"{materialName}.bmp");
+        return File.Exists(candidate) ? candidate : Path.Combine(bmpDirectory, "default.bmp");
     }
 }
