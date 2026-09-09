@@ -117,7 +117,7 @@ public sealed class BlockAccessor {
 }
 ```
 
-`BlockAccessor` itself is almost entirely project-specific (it's typed to one dialog's own blocks and DTOs) and is NOT something to pull from the shared foundation. The exception is the handful of fully generic NXMessageBox wrappers with no dialog-block dependency (a plain `Confirm`/`ShowResult`/`ShowError` trio) — those live once in `NxOpen.Foundation.NxAdapters.NxMessageBoxHelper` and `BlockAccessor` can forward to them instead of reimplementing the same three `NXMessageBox.Show` calls per project.
+`BlockAccessor` itself is almost entirely project-specific (it's typed to one dialog's own blocks and DTOs) and is NOT something to pull from the shared foundation. The exception is the handful of fully generic NXMessageBox wrappers with no dialog-block dependency (a plain `Confirm`/`ShowResult`/`ShowError` trio) — those live once in `BANxOpen.Foundation.NxAdapters.NxMessageBoxHelper` and `BlockAccessor` can forward to them instead of reimplementing the same three `NXMessageBox.Show` calls per project.
 
 Note: the actual block reads (`GetDouble` etc.) require a live NX session, so `BlockAccessor` itself is integration-tested, not unit-tested. The presenter's decision logic is what you cover by mocking.
 

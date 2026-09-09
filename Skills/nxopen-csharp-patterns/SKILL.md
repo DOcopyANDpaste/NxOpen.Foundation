@@ -25,7 +25,7 @@ Ui.Dialogs/       — Block UI Styler output + presenters (only if building dial
 
 Code flows: entry point → resolves adapters → calls Core logic → Core returns plain DTOs → entry point/adapter applies results to NX.
 
-A per-project `Contracts` layer is optional — some projects fold it directly into `Core` instead of keeping it as a separate project, when the seam it would enforce isn't load-bearing for that project's size. Either way, the shared, cross-project foundation this skill's own patterns are built from lives in `NxOpen.Foundation` (Contracts / Core / NxAdapters tiers), one directory up from any individual NX Open project — reuse generic plumbing (session access, undo scope, listing-window logging, material-library reading, the rule-engine shape) from there via a relative `ProjectReference` before writing a new copy in a project.
+A per-project `Contracts` layer is optional — some projects fold it directly into `Core` instead of keeping it as a separate project, when the seam it would enforce isn't load-bearing for that project's size. Either way, the shared, cross-project foundation this skill's own patterns are built from lives in `BANxOpen.Foundation` (Contracts / Core / NxAdapters tiers), one directory up from any individual NX Open project — reuse generic plumbing (session access, undo scope, listing-window logging, material-library reading, the rule-engine shape) from there via a relative `ProjectReference` before writing a new copy in a project.
 
 ## Choose the variant
 

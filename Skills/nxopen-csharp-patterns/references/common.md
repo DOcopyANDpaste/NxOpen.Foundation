@@ -93,10 +93,10 @@ Rule: every NXOpen builder is destroyed in a `finally`. Leaked builders corrupt 
 
 ## 4. Undo mark wrapper
 
-Standardize rollback with a disposable. Reuse `NxOpen.Foundation.NxAdapters.UndoScope` from the shared foundation rather than writing a new copy per project.
+Standardize rollback with a disposable. Reuse `BANxOpen.Foundation.NxAdapters.UndoScope` from the shared foundation rather than writing a new copy per project.
 
 ```csharp
-// NxOpen.Foundation.NxAdapters/UndoScope.cs
+// BANxOpen.Foundation.NxAdapters/UndoScope.cs
 using NXOpen;
 
 public sealed class UndoScope : IDisposable {

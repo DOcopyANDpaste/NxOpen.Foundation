@@ -133,10 +133,10 @@ Do not validate here — Core validates. This method only converts raw input to 
 
 ## 5. Batch-safe logging
 
-`Console.WriteLine` is invisible in NX. Write to the Listing Window (interactive) or a file (batch). Reuse `NxOpen.Foundation.NxAdapters.NxListingLog` from the shared foundation rather than writing a new copy per project.
+`Console.WriteLine` is invisible in NX. Write to the Listing Window (interactive) or a file (batch). Reuse `BANxOpen.Foundation.NxAdapters.NxListingLog` from the shared foundation rather than writing a new copy per project.
 
 ```csharp
-// NxOpen.Foundation.NxAdapters/NxListingLog.cs
+// BANxOpen.Foundation.NxAdapters/NxListingLog.cs
 using NXOpen;
 
 public sealed class NxListingLog {
