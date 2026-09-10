@@ -32,9 +32,15 @@ public sealed class FeatureConstraintGateRule : IMaterialAssignmentRule
 
     public int Order => 150;
 
+    /// <summary>The first unsatisfied Block constraint refuses the assignment, regardless of where it sits
+    /// relative to warnings — a warning must never mask a refusal. With no refusal, unsatisfied Warn
+    /// constraints produce a single Warn outcome carrying every warning message, so the user sees all of
+    /// them at once rather than one per attempt.</summary>
     public RuleOutcome Evaluate(MaterialAssignmentRuleContext context)
     {
         var candidate = MaterialCandidate.FromLibrary(context.RequestedMaterial);
+        MaterialConstraint? firstWarning = null;
+        var warningMessages = new List<string>();
 
         foreach (var provider in _providers)
         {
@@ -43,14 +49,18 @@ public sealed class FeatureConstraintGateRule : IMaterialAssignmentRule
                 if (constraint.IsSatisfiedBy(candidate))
                     continue;
 
-                return new RuleOutcome(
-                    RuleId,
-                    RuleDecision.Block,
-                    constraint.ReasonCode,
-                    $"{constraint.DescribeViolation(candidate)} (required by {constraint.SourceLabel})");
+                var message = $"{constraint.DescribeViolation(candidate)} (required by {constraint.SourceLabel})";
+
+                if (constraint.Severity == ConstraintSeverity.Block)
+                    return new RuleOutcome(RuleId, RuleDecision.Block, constraint.ReasonCode, message);
+
+                firstWarning ??= constraint;
+                warningMessages.Add(message);
             }
         }
 
-        return new RuleOutcome(RuleId, RuleDecision.Allow, null, null);
+        return firstWarning is null
+            ? new RuleOutcome(RuleId, RuleDecision.Allow, null, null)
+            : new RuleOutcome(RuleId, RuleDecision.Warn, firstWarning.ReasonCode, string.Join(" ", warningMessages));
     }
 }

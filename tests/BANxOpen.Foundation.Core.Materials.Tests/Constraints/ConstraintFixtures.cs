@@ -18,6 +18,16 @@ internal static class ConstraintFixtures
             IsSatisfiedBy: candidate => allowedNames.Contains(candidate.Name),
             DescribeViolation: candidate => $"'{candidate.Name}' is not allowed.");
 
+    /// <summary>An advisory that applies to every candidate and never blocks.</summary>
+    public static MaterialConstraint WarnAlways(string sourceLabel, string reasonCode, string message) =>
+        new(
+            DomainId: "TEST",
+            SourceLabel: sourceLabel,
+            ReasonCode: reasonCode,
+            IsSatisfiedBy: _ => false,
+            DescribeViolation: _ => message,
+            Severity: ConstraintSeverity.Warn);
+
     /// <summary>A provider with a fixed answer and a log of which bodies it was asked about — the log is
     /// what makes caching observable.</summary>
     public sealed class FakeConstraintProvider : IFeatureMaterialConstraintProvider

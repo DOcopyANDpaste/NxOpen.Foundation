@@ -113,6 +113,50 @@ public class FeatureConstraintGateRuleTests
     }
 
     [Fact]
+    public void A_warning_constraint_allows_the_assignment_with_a_warn_outcome()
+    {
+        var rule = new FeatureConstraintGateRule(
+            new FakeConstraintProvider("BEAD", WarnAlways("Bead(12)", "BEAD_UNMATCHED", "Bead(12) matches no SPEC.")));
+
+        var outcome = rule.Evaluate(Context("2024-O"));
+
+        Assert.Equal(RuleDecision.Warn, outcome.Decision);
+        Assert.Equal("BEAD_UNMATCHED", outcome.ReasonCode);
+        Assert.Contains("Bead(12) matches no SPEC.", outcome.Message);
+    }
+
+    [Fact]
+    public void A_block_wins_even_when_a_warning_is_listed_first()
+    {
+        // A warning must never mask a refusal.
+        var rule = new FeatureConstraintGateRule(
+            new FakeConstraintProvider(
+                "BEAD",
+                WarnAlways("Bead(12)", "BEAD_UNMATCHED", "advisory"),
+                AllowOnly("SPEC BA-1", "NOT_ALLOWED", "2024-O")));
+
+        var outcome = rule.Evaluate(Context("7075-T6"));
+
+        Assert.Equal(RuleDecision.Block, outcome.Decision);
+        Assert.Equal("NOT_ALLOWED", outcome.ReasonCode);
+    }
+
+    [Fact]
+    public void Every_warning_is_reported_together()
+    {
+        var rule = new FeatureConstraintGateRule(
+            new FakeConstraintProvider(
+                "BEAD",
+                WarnAlways("Bead(12)", "BEAD_UNMATCHED", "first advisory"),
+                WarnAlways("Bead(13)", "BEAD_UNMATCHED", "second advisory")));
+
+        var outcome = rule.Evaluate(Context("2024-O"));
+
+        Assert.Contains("first advisory", outcome.Message);
+        Assert.Contains("second advisory", outcome.Message);
+    }
+
+    [Fact]
     public void Queries_providers_for_the_body_under_evaluation()
     {
         var provider = new FakeConstraintProvider("BEAD");

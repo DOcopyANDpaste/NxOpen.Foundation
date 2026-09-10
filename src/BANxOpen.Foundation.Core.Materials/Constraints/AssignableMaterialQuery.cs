@@ -19,6 +19,12 @@ public sealed record MaterialAssignability(
     public IReadOnlyList<RuleOutcome> BlockingOutcomes =>
         Outcomes.Where(o => o.Decision == RuleDecision.Block).ToList();
 
+    /// <summary>Advisories that do not stop the assignment but should be shown to the user.</summary>
+    public IReadOnlyList<string> Warnings =>
+        Outcomes.Where(o => o.Decision == RuleDecision.Warn && !string.IsNullOrWhiteSpace(o.Message))
+            .Select(o => o.Message!)
+            .ToList();
+
     /// <summary>Why this material cannot go on the body, for a tooltip or an error line. Empty when it
     /// can.</summary>
     public string? BlockedReason =>

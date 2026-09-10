@@ -148,6 +148,18 @@ public class AssignableMaterialQueryTests
     }
 
     [Fact]
+    public void A_warned_candidate_is_still_offered()
+    {
+        var query = QueryWith(
+            new FakeConstraintProvider("BEAD", WarnAlways("Bead(12)", "BEAD_UNMATCHED", "matches no SPEC")));
+
+        var results = query.Evaluate(Body, null, Candidates());
+
+        Assert.All(results, r => Assert.True(r.IsAssignable));
+        Assert.All(results, r => Assert.Null(r.BlockedReason));
+    }
+
+    [Fact]
     public void Handles_an_empty_candidate_set()
     {
         var query = QueryWith();

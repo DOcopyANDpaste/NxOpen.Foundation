@@ -272,11 +272,24 @@ public sealed class PartMaterialService : IPartMaterialService
 
     // ---- NX reads/writes ----
 
-    private static BodyKind ClassifyBody(Body body)
+    /// <summary>Sheet metal is checked first and through the sheet metal manager: NX sheet metal bodies are
+    /// solids with a thickness, so <c>Body.IsSheetBody</c> is false for them, and classifying on that alone
+    /// labelled them Solid — which made BlockRestrictedBodyTypeRule refuse every sheet metal library material
+    /// on the very bodies those libraries exist for. <c>IsSheetmetalBody</c> is the same check the sheet
+    /// metal tools already use to accept a body.</summary>
+    private BodyKind ClassifyBody(Body body)
     {
-        // VERIFY: exact property/API — candidate is a direct boolean on Body (e.g. IsSheetBody); if no
-        // such property exists on the installed version, fall back to a UF_MODL body-type query instead
-        // (UFSession.Modl.AskBodyType or similar).
+        try
+        {
+            if (_context.WorkPart.Features.SheetmetalManager.IsSheetmetalBody(body))
+                return BodyKind.SheetMetal;
+        }
+        catch (NXException)
+        {
+            // Not answerable for this body — fall through to the plain solid/sheet test rather than calling
+            // it Unknown, which would also block every library.
+        }
+
         try
         {
             return body.IsSheetBody ? BodyKind.Sheet : BodyKind.Solid;
@@ -289,7 +302,8 @@ public sealed class PartMaterialService : IPartMaterialService
 
     private static double MeasureVolume(UFSession uf, Body body, BodyKind kind)
     {
-        if (kind != BodyKind.Solid)
+        // Sheet metal bodies are solids, so they have a volume just like any other solid.
+        if (kind != BodyKind.Solid && kind != BodyKind.SheetMetal)
             return 0.0;
 
         try
