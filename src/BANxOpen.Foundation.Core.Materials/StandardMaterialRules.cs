@@ -1,6 +1,7 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
 using BANxOpen.Foundation.Core.Materials.Assignment.Rules;
 using BANxOpen.Foundation.Core.Materials.Constraints;
+using BANxOpen.Foundation.Core.Materials.Library;
 
 namespace BANxOpen.Foundation.Core.Materials;
 
@@ -19,12 +20,16 @@ public static class StandardMaterialRules
     /// <paramref name="constraintProviders"/> is how a feature domain gets a say. Pass none — the default —
     /// and the feature-constraint rule is a no-op, which is exactly the behaviour before the seam existed.
     /// A composition root that wants domain restrictions enforced registers the domain's provider here;
-    /// see BANxOpen.SheetMetal for an implementation.</summary>
+    /// see BANxOpen.SheetMetal for an implementation.
+    ///
+    /// <paramref name="sheetMetalLibraries"/> is the configured list of sheet metal libraries, normally loaded
+    /// with <see cref="SheetMetalLibraries.Load"/>. Omitted, the name-based default applies.</summary>
     public static IReadOnlyList<IMaterialAssignmentRule> Gates(
-        IEnumerable<IFeatureMaterialConstraintProvider>? constraintProviders = null) =>
+        IEnumerable<IFeatureMaterialConstraintProvider>? constraintProviders = null,
+        SheetMetalLibraries? sheetMetalLibraries = null) =>
         new IMaterialAssignmentRule[]
         {
-            new BlockRestrictedBodyTypeRule(),
+            new BlockRestrictedBodyTypeRule(sheetMetalLibraries),
             new FeatureConstraintGateRule(
                 constraintProviders ?? Array.Empty<IFeatureMaterialConstraintProvider>()),
             new RequireConfirmationOnReassignmentRule(),

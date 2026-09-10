@@ -23,6 +23,11 @@ public sealed class FileSystemMaterialLibraryRepository : IMaterialLibraryReposi
         _onWarning = onWarning;
     }
 
+    /// <summary>The directory scanned for library XML files. Library-wide settings such as
+    /// <see cref="SheetMetalLibraries.FileName"/> live here too, so every tool reading these libraries reads
+    /// the same settings.</summary>
+    public string RootDirectory => _rootDirectory;
+
     public IReadOnlyList<MaterialLibraryReference> ListAvailableLibraries()
     {
         var references = new List<MaterialLibraryReference>();

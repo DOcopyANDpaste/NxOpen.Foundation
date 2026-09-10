@@ -15,6 +15,12 @@
     <ProjectReference Include="..\BANxOpen.Foundation.Core\BANxOpen.Foundation.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Reads material-library-rules.json (Library\SheetMetalLibraries.cs). net48 needs the package; net8.0
+         has it in-box, but taking it on both pins one version, matching BANxOpen.SheetMetal.Core. -->
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFrameworks>net48;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
