@@ -1,10 +1,10 @@
 using BANxOpen.Foundation.Contracts.Bodies;
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Contracts.Materials;
-using BANxOpen.Foundation.Core.Materials.Assignment;
+using BANxOpen.Foundation.Core.Materials.Rules.Features;
 using BANxOpen.Foundation.Core.RuleEngine;
 
-namespace BANxOpen.Foundation.Core.Materials.Constraints;
+namespace BANxOpen.Foundation.Core.Materials.Assignment;
 
 /// <summary>What one candidate material would do if assigned to the body, without assigning it.</summary>
 public sealed record MaterialAssignability(

@@ -2,10 +2,10 @@ using BANxOpen.Foundation.Core.RuleEngine;
 
 namespace BANxOpen.Foundation.Core.Materials.Assignment;
 
-/// <summary>A gate rule: decides whether an assignment is allowed, blocked, or needs user confirmation.
-/// Implement this to add a new business rule (e.g. a body-type/material restriction) without touching
-/// the planner or any other rule — that's the whole point of the pipeline. Thin specialization of the
-/// shared BANxOpen.Foundation.Core.RuleEngine.IGateRule shape.</summary>
-public interface IMaterialAssignmentRule : IGateRule<MaterialAssignmentRuleContext, RuleOutcome>
+/// <summary>A validation rule: decides whether an assignment is allowed, warned about, blocked, or needs user
+/// confirmation. Implement this to add a business rule without touching the planner or any other rule, and register
+/// it in the <see cref="Rules.IMaterialRuleModule"/> for its category. Thin specialization of the shared
+/// BANxOpen.Foundation.Core.RuleEngine.IGateRule shape.</summary>
+public interface IMaterialValidationRule : IGateRule<MaterialAssignmentRuleContext, RuleOutcome>
 {
 }

@@ -1,6 +1,6 @@
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.Materials.Constraints;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 /// <summary>One material being considered for a body, described in the terms a feature domain can judge
 /// it by without the engine knowing anything about that domain.

@@ -19,11 +19,15 @@ public sealed class PartMaterialService : IPartMaterialService
     private readonly BodyResolver _bodyResolver;
     private readonly DisplayMaterialHelper _displayMaterialHelper;
     private readonly NxPhysicalMaterialSource _physicalMaterials;
-    private readonly Dictionary<string, Func<SideEffectInstruction, Body, OperationResult>> _executors;
+    private readonly Dictionary<string, ISideEffectExecutor> _executors = new();
     private IReadOnlyList<BANxOpen.Foundation.Contracts.Materials.MaterialLibrary> _resolutionLibraries = Array.Empty<BANxOpen.Foundation.Contracts.Materials.MaterialLibrary>();
 
+    /// <summary>Normally built by <see cref="MaterialEngine.Create"/>, which also checks that
+    /// <paramref name="executors"/> covers every side effect the registered rules emit.</summary>
+    /// <param name="executors">One executor per instruction type, display material sync included.</param>
     public PartMaterialService(
         NxSessionContext context,
+        IEnumerable<ISideEffectExecutor> executors,
         BodyResolver? bodyResolver = null,
         DisplayMaterialHelper? displayMaterialHelper = null,
         NxPhysicalMaterialSource? physicalMaterials = null)
@@ -32,10 +36,20 @@ public sealed class PartMaterialService : IPartMaterialService
         _bodyResolver = bodyResolver ?? new BodyResolver(context);
         _displayMaterialHelper = displayMaterialHelper ?? new DisplayMaterialHelper(context);
         _physicalMaterials = physicalMaterials ?? new NxPhysicalMaterialSource(context);
-        _executors = new Dictionary<string, Func<SideEffectInstruction, Body, OperationResult>>
+
+        // A clash is a wiring error rather than something to settle silently: replacing one module's effect with
+        // another's would change what Apply does with nothing to show for it.
+        foreach (var executor in executors)
         {
-            [SideEffectInstructionTypes.AssignDisplayMaterial] = _displayMaterialHelper.Execute,
-        };
+            if (_executors.ContainsKey(executor.InstructionType))
+            {
+                throw new ArgumentException(
+                    $"A side-effect executor for instruction type '{executor.InstructionType}' is already registered.",
+                    nameof(executors));
+            }
+
+            _executors[executor.InstructionType] = executor;
+        }
     }
 
     public void SetResolutionLibraries(IReadOnlyList<BANxOpen.Foundation.Contracts.Materials.MaterialLibrary> libraries) =>
@@ -154,13 +168,16 @@ public sealed class PartMaterialService : IPartMaterialService
 
             foreach (var instruction in assignment.SideEffects)
             {
+                // MaterialEngine refuses to start with a side effect that has no executor, so reaching this means the
+                // service was built by hand with an incomplete list — reported as a failure rather than skipped quietly.
                 if (!_executors.TryGetValue(instruction.InstructionType, out var executor))
                 {
-                    _context.Log.Warn($"No executor registered for instruction type '{instruction.InstructionType}' — skipping (deferred feature).");
+                    anyFailed = true;
+                    _context.Log.Error($"No executor registered for instruction type '{instruction.InstructionType}'; side effect not applied to body '{assignment.BodyId}'.");
                     continue;
                 }
 
-                var result = executor(instruction, body);
+                var result = executor.Execute(instruction, body);
                 if (!result.Ok)
                 {
                     anyFailed = true;

@@ -1,12 +1,12 @@
 using BANxOpen.Foundation.Contracts.Bodies;
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Core.Materials.Assignment;
-using BANxOpen.Foundation.Core.Materials.Assignment.Rules;
-using BANxOpen.Foundation.Core.Materials.Library;
+using BANxOpen.Foundation.Core.Materials.Rules;
+using BANxOpen.Foundation.Core.Materials.Rules.SheetMetal;
 using BANxOpen.Foundation.Core.RuleEngine;
 using static BANxOpen.Foundation.Core.Materials.Tests.Assignment.TestFixtures;
 
-namespace BANxOpen.Foundation.Core.Materials.Tests.Library;
+namespace BANxOpen.Foundation.Core.Materials.Tests.Rules.SheetMetal;
 
 public class SheetMetalLibrariesTests : IDisposable
 {
@@ -105,10 +105,10 @@ public class SheetMetalLibrariesTests : IDisposable
     }
 
     [Fact]
-    public void Standard_gates_pass_the_configured_list_to_the_body_type_rule()
+    public void The_baseline_passes_the_configured_list_to_the_body_type_rule()
     {
-        var gates = StandardMaterialRules.Gates(sheetMetalLibraries: SheetMetalLibraries.FromNames(new[] { "Aero Skins" }));
-        var rule = gates.OfType<BlockRestrictedBodyTypeRule>().Single();
+        var rules = MaterialRuleSet.From(MaterialRuleSet.Baseline(SheetMetalLibraries.FromNames(new[] { "Aero Skins" })));
+        var rule = rules.ValidationRules.OfType<BlockRestrictedBodyTypeRule>().Single();
         var body = MakeBody("sm1", BodyKind.SheetMetal);
 
         var decision = rule.Evaluate(new MaterialAssignmentRuleContext(

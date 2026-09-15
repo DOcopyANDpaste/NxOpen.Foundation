@@ -1,4 +1,6 @@
-namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+using BANxOpen.Foundation.Core.Materials.Assignment;
+
+namespace BANxOpen.Foundation.Core.Materials.Rules.Standard;
 
 /// <summary>Emits a SYNC_PHYSICAL_PROPERTY instruction per numeric property on the assigned material,
 /// carrying the raw value and its unit string as-is. Unit conversion is deliberately NOT done here —
@@ -6,9 +8,15 @@ namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
 /// access and can't know the work part's units.</summary>
 public sealed class SyncPhysicalPropertiesEffectRule : IPostAssignmentEffectRule
 {
+    public const string InstructionType = "SYNC_PHYSICAL_PROPERTY";
+
+    private static readonly string[] EmittedInstructionTypes = { InstructionType };
+
     public string RuleId => "SYNC_PHYSICAL_PROPERTIES";
 
-    public int Order => 100;
+    public int Order => MaterialRuleOrder.SideEffect.MaterialProperties;
+
+    public IReadOnlyCollection<string> InstructionTypes => EmittedInstructionTypes;
 
     public IReadOnlyList<SideEffectInstruction> GenerateEffects(MaterialAssignmentRuleContext context)
     {
@@ -28,7 +36,7 @@ public sealed class SyncPhysicalPropertiesEffectRule : IPostAssignmentEffectRule
                 ["RawValue"] = property.RawValue,
                 ["Unit"] = property.Unit ?? string.Empty,
             };
-            instructions.Add(new SideEffectInstruction(SideEffectInstructionTypes.SyncPhysicalProperty, context.TargetBody.Id, data));
+            instructions.Add(new SideEffectInstruction(InstructionType, context.TargetBody.Id, data));
         }
 
         return instructions;

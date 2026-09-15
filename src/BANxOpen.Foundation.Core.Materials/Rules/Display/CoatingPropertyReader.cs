@@ -1,7 +1,7 @@
 using System.Globalization;
 using BANxOpen.Foundation.Contracts.Materials;
 
-namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Display;
 
 /// <summary>Shared parsing for the two coating-related material properties, used by both
 /// <see cref="ValidateCoatingDisplayMaterialRule"/> and <see cref="SyncCoatingDisplayMaterialEffectRule"/>

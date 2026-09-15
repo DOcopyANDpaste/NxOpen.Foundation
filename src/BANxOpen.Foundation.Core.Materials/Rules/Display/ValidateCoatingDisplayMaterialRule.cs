@@ -1,7 +1,8 @@
-using BANxOpen.Foundation.Core.RuleEngine;
 using BANxOpen.Foundation.Contracts.Materials;
+using BANxOpen.Foundation.Core.Materials.Assignment;
+using BANxOpen.Foundation.Core.RuleEngine;
 
-namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Display;
 
 /// <summary>Validates the coating/studio display-material data on the requested material, and, when the
 /// target body already has a material assigned, cross-checks that against the body's actual current
@@ -23,11 +24,11 @@ namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
 /// can choose to keep the body's current display material (decline) or update it to match the library
 /// (confirm) — per direct confirmation with the user, this is a decision, not just information.</item>
 /// </list></summary>
-public sealed class ValidateCoatingDisplayMaterialRule : IMaterialAssignmentRule
+public sealed class ValidateCoatingDisplayMaterialRule : IMaterialValidationRule
 {
     public string RuleId => "VALIDATE_COATING_DISPLAY_MATERIAL";
 
-    public int Order => 300;
+    public int Order => MaterialRuleOrder.Validation.Appearance;
 
     public RuleOutcome Evaluate(MaterialAssignmentRuleContext context)
     {

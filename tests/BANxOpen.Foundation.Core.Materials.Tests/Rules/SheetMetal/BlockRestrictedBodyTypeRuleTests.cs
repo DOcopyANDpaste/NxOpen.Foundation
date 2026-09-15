@@ -1,5 +1,5 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
-using BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+using BANxOpen.Foundation.Core.Materials.Rules.SheetMetal;
 using BANxOpen.Foundation.Core.Materials.Bodies;
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Contracts.Materials;
@@ -7,7 +7,7 @@ using BANxOpen.Foundation.Core.RuleEngine;
 using static BANxOpen.Foundation.Core.Materials.Tests.Assignment.TestFixtures;
 using BANxOpen.Foundation.Contracts.Bodies;
 
-namespace BANxOpen.Foundation.Core.Materials.Tests.Assignment.Rules;
+namespace BANxOpen.Foundation.Core.Materials.Tests.Rules.SheetMetal;
 
 public class BlockRestrictedBodyTypeRuleTests
 {

@@ -1,7 +1,7 @@
 using BANxOpen.Foundation.Contracts.Common;
-using BANxOpen.Foundation.Core.Materials.Constraints;
+using BANxOpen.Foundation.Core.Materials.Rules.Features;
 
-namespace BANxOpen.Foundation.Core.Materials.Tests.Constraints;
+namespace BANxOpen.Foundation.Core.Materials.Tests.Rules.Features;
 
 internal static class ConstraintFixtures
 {

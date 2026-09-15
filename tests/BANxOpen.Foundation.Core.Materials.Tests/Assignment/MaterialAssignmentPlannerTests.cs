@@ -31,7 +31,7 @@ public class MaterialAssignmentPlannerTests
         var mid = new FakeGateRule("mid", 200, ctx => { invocationLog.Add("mid"); return new RuleOutcome("mid", RuleDecision.Allow, null, null); });
 
         // Registered out of order on purpose — the planner must sort by Order, not registration order.
-        var planner = new MaterialAssignmentPlanner(new IMaterialAssignmentRule[] { late, early, mid });
+        var planner = new MaterialAssignmentPlanner(new IMaterialValidationRule[] { late, early, mid });
 
         planner.Plan(new MaterialAssignmentPlanningInput(
             MakeMaterial(), new[] { MakeBody("b1") }, new Dictionary<BodyId, BodyMaterialAssignment>()));
@@ -51,7 +51,7 @@ public class MaterialAssignmentPlannerTests
                 ? new RuleOutcome("blocker", RuleDecision.Block, "X", "x")
                 : new RuleOutcome("blocker", RuleDecision.Allow, null, null));
         var tracker = FakeGateRule.AlwaysAllow("later", 200);
-        var planner = new MaterialAssignmentPlanner(new IMaterialAssignmentRule[] { conditionalBlocker, tracker });
+        var planner = new MaterialAssignmentPlanner(new IMaterialValidationRule[] { conditionalBlocker, tracker });
 
         var plan = planner.Plan(new MaterialAssignmentPlanningInput(
             MakeMaterial(), new[] { blockedBody, cleanBody }, new Dictionary<BodyId, BodyMaterialAssignment>()));
@@ -73,7 +73,7 @@ public class MaterialAssignmentPlannerTests
             ctx.TargetBody.Id.Value == "needs-confirm"
                 ? new RuleOutcome("confirm", RuleDecision.RequireConfirmation, "C", "c")
                 : new RuleOutcome("confirm", RuleDecision.Allow, null, null));
-        var planner = new MaterialAssignmentPlanner(new IMaterialAssignmentRule[] { confirmRule });
+        var planner = new MaterialAssignmentPlanner(new IMaterialValidationRule[] { confirmRule });
 
         var plan = planner.Plan(new MaterialAssignmentPlanningInput(
             MakeMaterial(),

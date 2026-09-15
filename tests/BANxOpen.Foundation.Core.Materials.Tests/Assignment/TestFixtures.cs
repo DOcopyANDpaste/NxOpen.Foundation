@@ -19,7 +19,7 @@ internal static class TestFixtures
 
     /// <summary>A gate rule with fully controllable behavior and an invocation log, for testing the
     /// planner's ordering/short-circuit logic independent of any real business rule.</summary>
-    public sealed class FakeGateRule : IMaterialAssignmentRule
+    public sealed class FakeGateRule : IMaterialValidationRule
     {
         private readonly Func<MaterialAssignmentRuleContext, RuleOutcome> _evaluate;
 
@@ -67,6 +67,8 @@ internal static class TestFixtures
         public string RuleId { get; }
 
         public int Order { get; }
+
+        public IReadOnlyCollection<string> InstructionTypes { get; init; } = Array.Empty<string>();
 
         public List<BodyId> InvokedForBodies { get; } = new();
 

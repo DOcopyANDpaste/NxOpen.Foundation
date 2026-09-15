@@ -1,10 +1,10 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
-using BANxOpen.Foundation.Core.Materials.Constraints;
+using BANxOpen.Foundation.Core.Materials.Rules.Features;
 using BANxOpen.Foundation.Core.RuleEngine;
 using BANxOpen.Foundation.Core.Materials.Tests.Assignment;
-using static BANxOpen.Foundation.Core.Materials.Tests.Constraints.ConstraintFixtures;
+using static BANxOpen.Foundation.Core.Materials.Tests.Rules.Features.ConstraintFixtures;
 
-namespace BANxOpen.Foundation.Core.Materials.Tests.Constraints;
+namespace BANxOpen.Foundation.Core.Materials.Tests.Rules.Features;
 
 public class FeatureConstraintGateRuleTests
 {

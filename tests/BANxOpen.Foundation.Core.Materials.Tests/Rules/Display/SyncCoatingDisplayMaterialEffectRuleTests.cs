@@ -1,11 +1,11 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
-using BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+using BANxOpen.Foundation.Core.Materials.Rules.Display;
 using BANxOpen.Foundation.Core.Materials.Bodies;
 using BANxOpen.Foundation.Contracts.Materials;
 using static BANxOpen.Foundation.Core.Materials.Tests.Assignment.TestFixtures;
 using BANxOpen.Foundation.Contracts.Bodies;
 
-namespace BANxOpen.Foundation.Core.Materials.Tests.Assignment.Rules;
+namespace BANxOpen.Foundation.Core.Materials.Tests.Rules.Display;
 
 public class SyncCoatingDisplayMaterialEffectRuleTests
 {

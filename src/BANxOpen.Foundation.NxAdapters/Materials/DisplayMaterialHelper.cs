@@ -1,5 +1,5 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
-using BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+using BANxOpen.Foundation.Core.Materials.Rules.Display;
 using NXOpen;
 using NXOpen.UF;
 using BANxOpen.Foundation.Contracts.Common;
@@ -29,15 +29,17 @@ namespace BANxOpen.Foundation.NxAdapters.Materials;
 ///
 /// BodyId -&gt; Body resolution is not done here — this takes an already-resolved Body; that mapping is
 /// <see cref="BodyResolver"/>'s job, driven by <see cref="PartMaterialService"/>.</summary>
-public sealed class DisplayMaterialHelper
+public sealed class DisplayMaterialHelper : ISideEffectExecutor
 {
     private readonly NxSessionContext _context;
 
     public DisplayMaterialHelper(NxSessionContext context) => _context = context;
 
+    public string InstructionType => SyncCoatingDisplayMaterialEffectRule.InstructionType;
+
     public OperationResult Execute(SideEffectInstruction instruction, Body body)
     {
-        if (instruction.InstructionType != SideEffectInstructionTypes.AssignDisplayMaterial)
+        if (instruction.InstructionType != InstructionType)
         {
             return OperationResult.Fail(
                 "UNSUPPORTED_INSTRUCTION",

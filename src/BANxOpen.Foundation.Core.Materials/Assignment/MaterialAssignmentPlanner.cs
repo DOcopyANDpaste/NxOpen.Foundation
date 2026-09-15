@@ -8,9 +8,9 @@ namespace BANxOpen.Foundation.Core.Materials.Assignment;
 /// bodies in the batch are still evaluated independently.</summary>
 public sealed class MaterialAssignmentPlanner : IMaterialAssignmentPlanner
 {
-    private readonly IReadOnlyList<IMaterialAssignmentRule> _gateRules;
+    private readonly IReadOnlyList<IMaterialValidationRule> _gateRules;
 
-    public MaterialAssignmentPlanner(IEnumerable<IMaterialAssignmentRule> gateRules) =>
+    public MaterialAssignmentPlanner(IEnumerable<IMaterialValidationRule> gateRules) =>
         _gateRules = gateRules.OrderBy(r => r.Order).ToList();
 
     public AssignmentPlan Plan(MaterialAssignmentPlanningInput input)

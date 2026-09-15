@@ -1,6 +1,6 @@
 using BANxOpen.Foundation.Contracts.Common;
 
-namespace BANxOpen.Foundation.Core.Materials.Constraints;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 /// <summary>Implemented once per feature domain to say what the features already on a body demand of its
 /// material. The material engine calls this; it never learns what a bead, a louver or a casting is.

@@ -1,4 +1,6 @@
-namespace BANxOpen.Foundation.Core.Materials.Constraints;
+using BANxOpen.Foundation.Core.Materials.Assignment;
+
+namespace BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 /// <summary>What happens when a constraint is not satisfied.</summary>
 public enum ConstraintSeverity

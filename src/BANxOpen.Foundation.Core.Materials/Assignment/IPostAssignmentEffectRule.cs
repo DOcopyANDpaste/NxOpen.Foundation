@@ -8,4 +8,8 @@ namespace BANxOpen.Foundation.Core.Materials.Assignment;
 /// specialization of the shared BANxOpen.Foundation.Core.RuleEngine.IEffectRule shape.</summary>
 public interface IPostAssignmentEffectRule : IEffectRule<MaterialAssignmentRuleContext, SideEffectInstruction>
 {
+    /// <summary>Every <see cref="SideEffectInstruction.InstructionType"/> this rule can emit.
+    /// <see cref="Rules.MaterialRuleSet.EnsureExecutorsFor"/> checks each has an executor, so a side effect cannot be
+    /// registered without the code that carries it out.</summary>
+    IReadOnlyCollection<string> InstructionTypes { get; }
 }

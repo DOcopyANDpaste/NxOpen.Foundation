@@ -1,10 +1,10 @@
 using System.Text.Json;
 using BANxOpen.Foundation.Contracts.Common;
 
-namespace BANxOpen.Foundation.Core.Materials.Library;
+namespace BANxOpen.Foundation.Core.Materials.Rules.SheetMetal;
 
 /// <summary>Which material libraries hold sheet metal materials — the libraries
-/// <see cref="Assignment.Rules.BlockRestrictedBodyTypeRule"/> reserves for sheet metal bodies.
+/// <see cref="BlockRestrictedBodyTypeRule"/> reserves for sheet metal bodies.
 ///
 /// Configured in <c>material-library-rules.json</c>, which sits beside the library XML files so every tool
 /// reading those libraries reads the same rules:

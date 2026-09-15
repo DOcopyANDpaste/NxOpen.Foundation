@@ -1,6 +1,6 @@
 using BANxOpen.Foundation.Contracts.Common;
 
-namespace BANxOpen.Foundation.Core.Materials.Constraints;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 /// <summary>Memoises another provider's answers per body, for callers that ask about the same body many
 /// times in a row — filtering a whole library through the planner being the case that needs it, since

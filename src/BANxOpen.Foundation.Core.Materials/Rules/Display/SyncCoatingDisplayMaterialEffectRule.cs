@@ -1,6 +1,7 @@
 using BANxOpen.Foundation.Contracts.Materials;
+using BANxOpen.Foundation.Core.Materials.Assignment;
 
-namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Display;
 
 /// <summary>Emits an ASSIGN_DISPLAY_MATERIAL instruction carrying the coating's display material name
 /// and RGB, for the adapter layer to look up/create the display material in NX and assign it to the
@@ -9,6 +10,10 @@ namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
 /// specific gate rule executed, since the pipeline is meant to be composed freely.</summary>
 public sealed class SyncCoatingDisplayMaterialEffectRule : IPostAssignmentEffectRule
 {
+    /// <summary>The instruction type this rule emits. The NX executor (<c>DisplayMaterialHelper</c>) registers under
+    /// it, so the two cannot drift apart via a typo.</summary>
+    public const string InstructionType = "ASSIGN_DISPLAY_MATERIAL";
+
     /// <summary>Data key for the display material name — a <c>string</c>.</summary>
     public const string DisplayMaterialNameDataKey = "DisplayMaterialName";
 
@@ -22,9 +27,13 @@ public sealed class SyncCoatingDisplayMaterialEffectRule : IPostAssignmentEffect
     /// — a <c>bool</c>. Lets the adapter layer warn the user when the library data was incomplete.</summary>
     public const string UsedDefaultDataKey = "UsedDefault";
 
+    private static readonly string[] EmittedInstructionTypes = { InstructionType };
+
     public string RuleId => "SYNC_COATING_DISPLAY_MATERIAL";
 
-    public int Order => 200;
+    public int Order => MaterialRuleOrder.SideEffect.Appearance;
+
+    public IReadOnlyCollection<string> InstructionTypes => EmittedInstructionTypes;
 
     public IReadOnlyList<SideEffectInstruction> GenerateEffects(MaterialAssignmentRuleContext context)
     {
@@ -50,6 +59,6 @@ public sealed class SyncCoatingDisplayMaterialEffectRule : IPostAssignmentEffect
             [UsedDefaultDataKey] = usedDefault,
         };
 
-        return new[] { new SideEffectInstruction(SideEffectInstructionTypes.AssignDisplayMaterial, context.TargetBody.Id, data) };
+        return new[] { new SideEffectInstruction(InstructionType, context.TargetBody.Id, data) };
     }
 }

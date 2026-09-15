@@ -1,14 +1,15 @@
+using BANxOpen.Foundation.Core.Materials.Assignment;
 using BANxOpen.Foundation.Core.RuleEngine;
 
-namespace BANxOpen.Foundation.Core.Materials.Assignment.Rules;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Standard;
 
 /// <summary>If the body already has a different material assigned, require the user to confirm the
 /// overwrite before it proceeds.</summary>
-public sealed class RequireConfirmationOnReassignmentRule : IMaterialAssignmentRule
+public sealed class RequireConfirmationOnReassignmentRule : IMaterialValidationRule
 {
     public string RuleId => "CONFIRM_REASSIGNMENT";
 
-    public int Order => 200;
+    public int Order => MaterialRuleOrder.Validation.Confirmation;
 
     public RuleOutcome Evaluate(MaterialAssignmentRuleContext context)
     {

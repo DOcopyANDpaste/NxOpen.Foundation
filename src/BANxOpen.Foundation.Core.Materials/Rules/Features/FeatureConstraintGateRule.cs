@@ -1,16 +1,16 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
 using BANxOpen.Foundation.Core.RuleEngine;
 
-namespace BANxOpen.Foundation.Core.Materials.Constraints;
+namespace BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 /// <summary>Blocks an assignment that the features already on the target body forbid.
 ///
-/// Ordered at 150, between the body-type restriction (100) and the reassignment confirmation (200): a
-/// material the body's features rule out should be rejected outright rather than confirmed, so this has
-/// to run before anything that asks the user a question.
+/// Ordered at <see cref="MaterialRuleOrder.Validation.FeatureConstraints"/>, after the body-type restriction and
+/// before the reassignment confirmation: a material the body's features rule out should be rejected outright
+/// rather than confirmed, so this has to run before anything that asks the user a question.
 ///
-/// With no providers registered this is a no-op that always allows, so wiring it into the standard rule
-/// set costs nothing until a feature domain opts in.
+/// <see cref="MaterialRuleSet"/> adds exactly one of these, fed by every module's feature constraints. With no
+/// providers registered it is a no-op that always allows, so it costs nothing until a feature domain opts in.
 ///
 /// Deliberately stateless — it queries the providers on every evaluation. The planner evaluates each body
 /// exactly once per plan, so an Apply pays for one provider call per body either way. Repeatedly planning
@@ -18,8 +18,10 @@ namespace BANxOpen.Foundation.Core.Materials.Constraints;
 /// that would benefit from memoisation, and that is what <see cref="CachingFeatureConstraintProvider"/>
 /// is for: the caller decides its lifetime, so a cache can never outlive the model state it was read
 /// from.</summary>
-public sealed class FeatureConstraintGateRule : IMaterialAssignmentRule
+public sealed class FeatureConstraintGateRule : IMaterialValidationRule
 {
+    public const string Id = "FEATURE_MATERIAL_CONSTRAINT";
+
     private readonly IReadOnlyList<IFeatureMaterialConstraintProvider> _providers;
 
     public FeatureConstraintGateRule(IEnumerable<IFeatureMaterialConstraintProvider> providers) =>
@@ -28,9 +30,9 @@ public sealed class FeatureConstraintGateRule : IMaterialAssignmentRule
     public FeatureConstraintGateRule(params IFeatureMaterialConstraintProvider[] providers)
         : this((IEnumerable<IFeatureMaterialConstraintProvider>)providers) { }
 
-    public string RuleId => "FEATURE_MATERIAL_CONSTRAINT";
+    public string RuleId => Id;
 
-    public int Order => 150;
+    public int Order => MaterialRuleOrder.Validation.FeatureConstraints;
 
     /// <summary>The first unsatisfied Block constraint refuses the assignment, regardless of where it sits
     /// relative to warnings — a warning must never mask a refusal. With no refusal, unsatisfied Warn
