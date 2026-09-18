@@ -1,4 +1,5 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
+using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
 using BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 namespace BANxOpen.Foundation.Core.Materials.Rules;
@@ -17,6 +18,9 @@ namespace BANxOpen.Foundation.Core.Materials.Rules;
 /// <see cref="SideEffectRules"/>, ordered with <see cref="MaterialRuleOrder.SideEffect"/>, plus an executor for its
 /// instruction type on the NX side of the module. <see cref="MaterialRuleSet.EnsureExecutorsFor"/> refuses a side
 /// effect that has no executor.</item>
+/// <item>Something only the user can decide, that one of those side effects then acts on → an
+/// <see cref="IAssignmentChoiceProvider"/> in <see cref="ChoiceProviders"/>. Pair it with the effect rule that
+/// reads its answer, sharing the choice id between them.</item>
 /// </list>
 /// A new category is a new module registered with <see cref="MaterialRuleSet"/>; the planner, finalizer and
 /// every other module stay untouched.
@@ -32,4 +36,7 @@ public interface IMaterialRuleModule
     IReadOnlyList<IFeatureMaterialConstraintProvider> FeatureConstraints { get; }
 
     IReadOnlyList<IPostAssignmentEffectRule> SideEffectRules { get; }
+
+    /// <summary>Questions this module needs put to the user before its side effects can run.</summary>
+    IReadOnlyList<IAssignmentChoiceProvider> ChoiceProviders { get; }
 }

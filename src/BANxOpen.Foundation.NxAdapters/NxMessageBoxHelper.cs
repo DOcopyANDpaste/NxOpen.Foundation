@@ -24,4 +24,9 @@ public static class NxMessageBoxHelper
 
     public static void ShowError(string message) =>
         UI.GetUI().NXMessageBox.Show("Error", NXMessageBox.DialogType.Error, message);
+
+    /// <summary>Tells the user something that is neither a failure nor a question — chiefly a choice a rule
+    /// made on their behalf, which they would otherwise have no way of knowing about.</summary>
+    public static void ShowInfo(string title, string message) =>
+        UI.GetUI().NXMessageBox.Show(title, NXMessageBox.DialogType.Information, message);
 }

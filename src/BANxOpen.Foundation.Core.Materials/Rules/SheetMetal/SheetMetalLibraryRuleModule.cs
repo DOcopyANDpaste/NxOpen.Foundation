@@ -1,4 +1,5 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
+using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
 using BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 namespace BANxOpen.Foundation.Core.Materials.Rules.SheetMetal;
@@ -26,4 +27,6 @@ public sealed class SheetMetalLibraryRuleModule : IMaterialRuleModule
     public IReadOnlyList<IFeatureMaterialConstraintProvider> FeatureConstraints => Array.Empty<IFeatureMaterialConstraintProvider>();
 
     public IReadOnlyList<IPostAssignmentEffectRule> SideEffectRules => Array.Empty<IPostAssignmentEffectRule>();
+
+    public IReadOnlyList<IAssignmentChoiceProvider> ChoiceProviders => Array.Empty<IAssignmentChoiceProvider>();
 }

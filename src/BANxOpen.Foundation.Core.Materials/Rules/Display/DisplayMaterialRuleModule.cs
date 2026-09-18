@@ -1,4 +1,5 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
+using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
 using BANxOpen.Foundation.Core.Materials.Rules.Features;
 
 namespace BANxOpen.Foundation.Core.Materials.Rules.Display;
@@ -23,4 +24,6 @@ public sealed class DisplayMaterialRuleModule : IMaterialRuleModule
     {
         new SyncCoatingDisplayMaterialEffectRule(),
     };
+
+    public IReadOnlyList<IAssignmentChoiceProvider> ChoiceProviders => Array.Empty<IAssignmentChoiceProvider>();
 }

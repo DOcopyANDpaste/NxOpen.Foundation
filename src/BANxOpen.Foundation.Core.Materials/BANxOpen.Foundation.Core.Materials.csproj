@@ -1,24 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!--
-    The material engine: library loading/parsing/caching, the assignment planner and finalizer, the
-    standard rule set, and the feature-constraint seam. Deliberately free of NXOpen so it targets
-    net8.0 as well as net48 and stays unit-testable on a machine without NX installed; every NX call
-    it needs arrives through IPartMaterialService, implemented in BANxOpen.Foundation.NxAdapters.
-
-    Split out of BANxOpen.Foundation.Core so that Core carries nothing but the rule engine: a tool
-    that wants the gate/effect pattern but never touches materials references Core alone.
-  -->
+  <!-- The material engine, free of NXOpen (every NX call goes through IPartMaterialService) so its tests run without an NX session. -->
 
   <ItemGroup>
     <ProjectReference Include="..\BANxOpen.Foundation.Contracts\BANxOpen.Foundation.Contracts.csproj" />
     <ProjectReference Include="..\BANxOpen.Foundation.Core\BANxOpen.Foundation.Core.csproj" />
   </ItemGroup>
 
+  <!-- Uses NX's own Newtonsoft.Json so a tool inside NX never loads a second copy; building therefore needs NX installed. -->
+  <Target Name="RequireUgiiBaseDir" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="'$(UGII_BASE_DIR)' == ''"
+           Text="UGII_BASE_DIR is not set. This project references Newtonsoft.Json from the NX installation (NXBIN\managed) and can only be built on a machine with NX installed." />
+  </Target>
+
   <ItemGroup>
-    <!-- Reads material-library-rules.json (Library\SheetMetalLibraries.cs). net48 needs the package; net8.0
-         has it in-box, but taking it on both pins one version, matching BANxOpen.SheetMetal.Core. -->
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <!-- Copy-local so the net8.0 tests find it beside the test binaries. -->
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(UGII_BASE_DIR)\NXBIN\managed\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
 
   <PropertyGroup>

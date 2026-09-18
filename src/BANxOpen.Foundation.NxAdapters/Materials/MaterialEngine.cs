@@ -15,15 +15,20 @@ namespace BANxOpen.Foundation.NxAdapters.Materials;
 /// a defect in the tool that the first launch should expose rather than a dialog that runs with a rule missing.</summary>
 public sealed class MaterialEngine
 {
-    private MaterialEngine(MaterialRuleSet rules, IPartMaterialService partMaterials)
+    private MaterialEngine(MaterialRuleSet rules, IPartMaterialService partMaterials, SheetMetalLibraries sheetMetalLibraries)
     {
         Rules = rules;
         PartMaterials = partMaterials;
+        SheetMetalLibraries = sheetMetalLibraries;
     }
 
     public MaterialRuleSet Rules { get; }
 
     public IPartMaterialService PartMaterials { get; }
+
+    /// <summary>Which libraries hold sheet metal materials — the same list the body-type rule enforces, so a tool
+    /// looking a sheet metal material up by name searches exactly the libraries the rules accept.</summary>
+    public SheetMetalLibraries SheetMetalLibraries { get; }
 
     /// <param name="libraryRootDirectory">The material library folder, where the library rules file is looked for.</param>
     /// <param name="domainModules">The feature domains' modules, e.g. <c>SheetMetalServices.MaterialModules</c>.</param>
@@ -64,6 +69,6 @@ public sealed class MaterialEngine
         var physicalMaterials = new NxPhysicalMaterialSource(context);
         var partMaterials = new PartMaterialService(context, executors, bodyResolver, displayMaterialHelper, physicalMaterials);
 
-        return OperationResult<MaterialEngine>.Success(new MaterialEngine(rules, partMaterials));
+        return OperationResult<MaterialEngine>.Success(new MaterialEngine(rules, partMaterials, sheetMetalLibraries));
     }
 }

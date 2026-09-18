@@ -1,4 +1,5 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
+using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
 using BANxOpen.Foundation.Core.Materials.Rules.Display;
 using BANxOpen.Foundation.Core.Materials.Rules.Features;
 using BANxOpen.Foundation.Core.Materials.Rules.SheetMetal;
@@ -28,6 +29,7 @@ public sealed class MaterialRuleSet
         _featureConstraints = modules.SelectMany(m => m.FeatureConstraints).ToList();
         ValidationRules = WithFeatureGate(_featureConstraints);
         SideEffectRules = modules.SelectMany(m => m.SideEffectRules).OrderBy(r => r.Order).ToList();
+        ChoiceProviders = modules.SelectMany(m => m.ChoiceProviders).ToList();
     }
 
     /// <summary>The modules every entry point starts from: standard rules, display material, and the sheet metal
@@ -74,6 +76,23 @@ public sealed class MaterialRuleSet
             }
         }
 
+        // Answers are keyed by choice id, so two providers sharing one would each read the other's answer.
+        var choiceOwners = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var module in list)
+        {
+            foreach (var provider in module.ChoiceProviders)
+            {
+                if (choiceOwners.TryGetValue(provider.ChoiceId, out var owner))
+                {
+                    throw new ArgumentException(
+                        $"Choice id '{provider.ChoiceId}' in module '{module.ModuleId}' is already registered by '{owner}'.",
+                        nameof(modules));
+                }
+
+                choiceOwners[provider.ChoiceId] = module.ModuleId;
+            }
+        }
+
         return new MaterialRuleSet(list);
     }
 
@@ -85,6 +104,9 @@ public sealed class MaterialRuleSet
     /// <summary>Every side-effect rule in evaluation order.</summary>
     public IReadOnlyList<IPostAssignmentEffectRule> SideEffectRules { get; }
 
+    /// <summary>Every choice provider, in module order.</summary>
+    public IReadOnlyList<IAssignmentChoiceProvider> ChoiceProviders { get; }
+
     /// <param name="cacheFeatureConstraints">Memoise each body's feature constraints for the planner's lifetime.
     /// For planning one body against many candidate materials (<see cref="AssignableMaterialQuery"/>); create a new
     /// planner for each such query, since constraints come from live model state — see
@@ -94,7 +116,10 @@ public sealed class MaterialRuleSet
             ? WithFeatureGate(CachingFeatureConstraintProvider.WrapAll(_featureConstraints))
             : ValidationRules);
 
-    public IAssignmentPlanFinalizer CreateFinalizer() => new AssignmentPlanFinalizer(SideEffectRules);
+    public IAssignmentPlanFinalizer CreateFinalizer() => new AssignmentPlanFinalizer(SideEffectRules, ChoiceProviders);
+
+    /// <summary>Gathers the modules' questions for one Apply; unanswered ones make the finalizer skip the body.</summary>
+    public IAssignmentChoiceCollector CreateChoiceCollector() => new AssignmentChoiceCollector(ChoiceProviders);
 
     /// <summary>Checks that every instruction type a registered side-effect rule can emit has an executor.</summary>
     /// <exception cref="InvalidOperationException">Lists each instruction type with no executor and the rule and

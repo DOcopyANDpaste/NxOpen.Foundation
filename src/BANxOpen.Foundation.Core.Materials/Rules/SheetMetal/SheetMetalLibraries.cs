@@ -1,5 +1,5 @@
-using System.Text.Json;
 using BANxOpen.Foundation.Contracts.Common;
+using Newtonsoft.Json;
 
 namespace BANxOpen.Foundation.Core.Materials.Rules.SheetMetal;
 
@@ -73,8 +73,9 @@ public sealed class SheetMetalLibraries
         RulesFile? file;
         try
         {
-            using var stream = File.OpenRead(path);
-            file = JsonSerializer.Deserialize<RulesFile>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            // Newtonsoft matches property names case-insensitively by default, which is what the reader has always
+            // accepted here.
+            file = JsonConvert.DeserializeObject<RulesFile>(File.ReadAllText(path));
         }
         catch (JsonException ex)
         {

@@ -1,59 +1,67 @@
 using BANxOpen.Foundation.Contracts.Common;
+using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
 
 namespace BANxOpen.Foundation.Core.Materials.Assignment;
 
-/// <summary>Turns an <see cref="AssignmentPlan"/> plus the user's confirm/decline answers into the
-/// single atomic <see cref="ExecutablePlan"/> for one Apply click. Partial-apply semantics: blocked and
-/// declined bodies are skipped and reported, clean/confirmed bodies are still assigned as part of the
-/// same plan (still one undo mark for the adapter to wrap).</summary>
+/// <summary>Turns an <see cref="AssignmentPlan"/> plus the user's confirm/decline answers and their answers to
+/// any <see cref="AssignmentChoice"/> into the single atomic <see cref="ExecutablePlan"/> for one Apply click.
+/// Partial-apply semantics: blocked, declined and unanswered bodies are skipped and reported, the rest are
+/// still assigned as part of the same plan (still one undo mark for the adapter to wrap).</summary>
 public sealed class AssignmentPlanFinalizer : IAssignmentPlanFinalizer
 {
     private readonly IReadOnlyList<IPostAssignmentEffectRule> _effectRules;
+    private readonly IReadOnlyList<IAssignmentChoiceProvider> _choiceProviders;
 
-    public AssignmentPlanFinalizer(IEnumerable<IPostAssignmentEffectRule> effectRules) =>
+    public AssignmentPlanFinalizer(
+        IEnumerable<IPostAssignmentEffectRule> effectRules,
+        IEnumerable<IAssignmentChoiceProvider>? choiceProviders = null)
+    {
         _effectRules = effectRules.OrderBy(r => r.Order).ToList();
+        _choiceProviders = choiceProviders?.ToList() ?? new List<IAssignmentChoiceProvider>();
+    }
 
     public ExecutablePlan Finalize(
         AssignmentPlan plan,
         MaterialAssignmentPlanningInput input,
-        HashSet<BodyId> confirmedBodyIds)
+        HashSet<BodyId> confirmedBodyIds) =>
+        Finalize(plan, input, confirmedBodyIds, AssignmentChoiceAnswers.Empty);
+
+    public ExecutablePlan Finalize(
+        AssignmentPlan plan,
+        MaterialAssignmentPlanningInput input,
+        HashSet<BodyId> confirmedBodyIds,
+        AssignmentChoiceAnswers choiceAnswers)
     {
-        var bodiesById = input.TargetBodies.ToDictionary(b => b.Id);
+        var targets = AssignmentTargets.Select(plan, input, confirmedBodyIds);
+
         var assignments = new List<ExecutableAssignment>();
-        var skippedBlocked = new List<BodyId>();
-        var skippedDeclined = new List<BodyId>();
+        var skippedUnresolved = new List<BodyId>();
 
-        foreach (var evaluation in plan.BodyEvaluations)
+        foreach (var target in targets.ToAssign)
         {
-            if (evaluation.IsBlocked)
-            {
-                skippedBlocked.Add(evaluation.BodyId);
-                continue;
-            }
-
-            if (evaluation.RequiresConfirmation && !confirmedBodyIds.Contains(evaluation.BodyId))
-            {
-                skippedDeclined.Add(evaluation.BodyId);
-                continue;
-            }
-
-            // A plan evaluated against a different input than the one being finalized (e.g. the part was
-            // rescanned in between and a body disappeared) would otherwise throw here mid-loop, losing
-            // the assignments already accumulated. Skipping keeps partial-apply semantics intact.
-            if (!bodiesById.TryGetValue(evaluation.BodyId, out var targetBody))
-            {
-                skippedBlocked.Add(evaluation.BodyId);
-                continue;
-            }
-
-            input.CurrentAssignments.TryGetValue(evaluation.BodyId, out var currentAssignment);
+            input.CurrentAssignments.TryGetValue(target.Body.Id, out var currentAssignment);
             var context = new MaterialAssignmentRuleContext(
-                input.RequestedMaterial, targetBody, currentAssignment, input.TargetBodies);
+                input.RequestedMaterial, target.Body, currentAssignment, input.TargetBodies)
+            {
+                ChoiceAnswers = choiceAnswers,
+            };
+
+            // Skipped whole rather than assigned half-done: its effect rules need an answer they don't have.
+            if (_choiceProviders.Any(p => p.ChoiceFor(context) is { } choice
+                                          && !choiceAnswers.TryGet(choice.ChoiceId, target.Body.Id, out _)))
+            {
+                skippedUnresolved.Add(target.Body.Id);
+                continue;
+            }
 
             var effects = _effectRules.SelectMany(rule => rule.GenerateEffects(context)).ToList();
-            assignments.Add(new ExecutableAssignment(evaluation.BodyId, plan.RequestedMaterialId, effects));
+            assignments.Add(new ExecutableAssignment(target.Body.Id, plan.RequestedMaterialId, effects));
         }
 
-        return new ExecutablePlan(plan.PlanId, assignments, skippedBlocked, skippedDeclined);
+        return new ExecutablePlan(
+            plan.PlanId, assignments, targets.SkippedBlocked, targets.SkippedDeclinedConfirmation)
+        {
+            SkippedUnresolvedChoice = skippedUnresolved,
+        };
     }
 }
