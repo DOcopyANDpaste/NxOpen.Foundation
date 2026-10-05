@@ -46,9 +46,12 @@ public sealed class AssignmentPlanFinalizer : IAssignmentPlanFinalizer
                 ChoiceAnswers = choiceAnswers,
             };
 
-            // Skipped whole rather than assigned half-done: its effect rules need an answer they don't have.
+            // Skipped whole rather than assigned half-done: its effect rules need an answer they don't have. An
+            // answer naming a blocked option counts as none — the UI should never send one, and acting on it would
+            // apply exactly what the domain refused.
             if (_choiceProviders.Any(p => p.ChoiceFor(context) is { } choice
-                                          && !choiceAnswers.TryGet(choice.ChoiceId, target.Body.Id, out _)))
+                                          && (!choiceAnswers.TryGet(choice.ChoiceId, target.Body.Id, out var optionId)
+                                              || choice.Find(optionId)?.IsBlocked == true)))
             {
                 skippedUnresolved.Add(target.Body.Id);
                 continue;

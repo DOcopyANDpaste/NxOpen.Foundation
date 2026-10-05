@@ -17,11 +17,18 @@ public sealed record AssignmentChoiceColumn(string Header, bool IsNumeric = fals
 /// <param name="ConfirmationPrompt">When non-null, the UI must ask this question and get a yes before accepting
 /// the option. For an option that is allowed but questionable — a sheet metal row whose thickness is not the
 /// body's. The text is shown verbatim, so it must make sense on its own.</param>
+/// <param name="BlockReason">When non-null, the option is listed — so the user can see it exists and why it is
+/// unavailable — but must not be chosen. The UI shows this text instead of accepting the pick, and the finalizer
+/// treats an answer naming it as no answer at all. Takes precedence over <paramref name="ConfirmationPrompt"/>.</param>
 public sealed record AssignmentChoiceOption(
     string OptionId,
     IReadOnlyList<string> Cells,
     bool IsPreferred = false,
-    string? ConfirmationPrompt = null);
+    string? ConfirmationPrompt = null,
+    string? BlockReason = null)
+{
+    public bool IsBlocked => BlockReason is not null;
+}
 
 /// <summary>A choice the domain made on the user's behalf. The UI shows <see cref="Message"/> and does not
 /// prompt.</summary>

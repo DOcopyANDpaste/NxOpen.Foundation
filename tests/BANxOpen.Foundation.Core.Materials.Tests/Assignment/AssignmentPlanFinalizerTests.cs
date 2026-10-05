@@ -209,6 +209,42 @@ public class AssignmentPlanFinalizerTests
         Assert.Equal(new[] { "late" }, executablePlan.SkippedUnresolvedChoice.Select(b => b.Value));
     }
 
+    [Fact]
+    public void Finalize_TreatsAnAnswerNamingABlockedOptionAsUnanswered()
+    {
+        // A blocked option is listed only to say why it is unavailable; applying it would do what the domain refused.
+        var plan = MakePlan(Allowed("blocked-pick"), Allowed("open-pick"));
+        var bodies = new[] { MakeBody("blocked-pick"), MakeBody("open-pick") };
+        var input = new MaterialAssignmentPlanningInput(MakeMaterial(), bodies, new Dictionary<BodyId, BodyMaterialAssignment>());
+
+        var answers = AssignmentChoiceAnswers.CreateBuilder()
+            .AnswerDirectly(AsksWithBlockedOption.Id, new BodyId("blocked-pick"), "refused")
+            .AnswerDirectly(AsksWithBlockedOption.Id, new BodyId("open-pick"), "ok")
+            .Build();
+
+        var executablePlan = new AssignmentPlanFinalizer(Array.Empty<IPostAssignmentEffectRule>(), new[] { new AsksWithBlockedOption() })
+            .Finalize(plan, input, new HashSet<BodyId>(), answers);
+
+        Assert.Equal(new[] { "open-pick" }, executablePlan.Assignments.Select(a => a.BodyId.Value));
+        Assert.Equal(new[] { "blocked-pick" }, executablePlan.SkippedUnresolvedChoice.Select(b => b.Value));
+    }
+
+    private sealed class AsksWithBlockedOption : IAssignmentChoiceProvider
+    {
+        public const string Id = "TEST.BLOCKING_CHOICE";
+
+        public string ChoiceId => Id;
+
+        public AssignmentChoice? ChoiceFor(MaterialAssignmentRuleContext context) =>
+            new(Id, context.TargetBody.Id, context.TargetBody.Id.Value, "Pick", "Pick",
+                new[] { new AssignmentChoiceColumn("Only") },
+                new[]
+                {
+                    new AssignmentChoiceOption("ok", new[] { "ok" }),
+                    new AssignmentChoiceOption("refused", new[] { "refused" }, BlockReason: "not allowed"),
+                });
+    }
+
     private sealed class AlwaysAsks : IAssignmentChoiceProvider
     {
         public const string Id = "TEST.CHOICE";
