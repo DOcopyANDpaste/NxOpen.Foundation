@@ -35,7 +35,7 @@ public sealed class NxSessionContext
 
     /// <summary>The NX application the session was in when the tool launched, as <c>Session.ApplicationName</c>
     /// reports it (e.g. <see cref="NxApplicationNames.SheetMetal"/>). Empty when NX could not say.</summary>
-    public string CurrentApplication { get; }
+    private string CurrentApplication { get; }
 
     public bool IsSheetMetalApplication =>
         string.Equals(CurrentApplication, NxApplicationNames.SheetMetal, StringComparison.OrdinalIgnoreCase);

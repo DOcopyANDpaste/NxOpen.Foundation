@@ -61,7 +61,7 @@ public sealed record RequirementDiff(
 
     /// <summary>Whether two specs would leave the same thing in NX. Value lists compare in order — the order is what
     /// NX shows — while associated objects compare as a set, since NX does not keep their order.</summary>
-    public static bool AreEquivalent(RequirementSpec a, RequirementSpec b) =>
+    private static bool AreEquivalent(RequirementSpec a, RequirementSpec b) =>
         a.Domain == b.Domain
         && a.Key == b.Key
         && a.Aspect == b.Aspect

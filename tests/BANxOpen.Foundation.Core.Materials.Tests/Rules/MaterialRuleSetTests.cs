@@ -155,44 +155,6 @@ public class MaterialRuleSetTests
     }
 
     [Fact]
-    public void A_cached_planner_reads_each_bodys_constraints_once_across_candidates()
-    {
-        var provider = new FakeConstraintProvider("A", AllowOnly("SPEC A", "NOT_ALLOWED", "2024-O"));
-        var rules = BaselineWith(new FakeModule("TEST.A", constraints: new IFeatureMaterialConstraintProvider[] { provider }));
-
-        new AssignableMaterialQuery(rules.CreatePlanner(cacheFeatureConstraints: true))
-            .Evaluate(TestFixtures.MakeBody("body-1"), null, Candidates());
-
-        Assert.Single(provider.QueriedBodies);
-    }
-
-    [Fact]
-    public void Each_cached_planner_starts_with_an_empty_cache()
-    {
-        // Constraints come from live model state; a cache shared between listings would answer from a model
-        // the user has since changed.
-        var provider = new FakeConstraintProvider("A", AllowOnly("SPEC A", "NOT_ALLOWED", "2024-O"));
-        var rules = BaselineWith(new FakeModule("TEST.A", constraints: new IFeatureMaterialConstraintProvider[] { provider }));
-        var body = TestFixtures.MakeBody("body-1");
-
-        new AssignableMaterialQuery(rules.CreatePlanner(cacheFeatureConstraints: true)).Evaluate(body, null, Candidates());
-        new AssignableMaterialQuery(rules.CreatePlanner(cacheFeatureConstraints: true)).Evaluate(body, null, Candidates());
-
-        Assert.Equal(2, provider.QueriedBodies.Count);
-    }
-
-    [Fact]
-    public void An_uncached_planner_asks_the_provider_on_every_plan()
-    {
-        var provider = new FakeConstraintProvider("A", AllowOnly("SPEC A", "NOT_ALLOWED", "2024-O"));
-        var rules = BaselineWith(new FakeModule("TEST.A", constraints: new IFeatureMaterialConstraintProvider[] { provider }));
-
-        new AssignableMaterialQuery(rules.CreatePlanner()).Evaluate(TestFixtures.MakeBody("body-1"), null, Candidates());
-
-        Assert.Equal(Candidates().Count(), provider.QueriedBodies.Count);
-    }
-
-    [Fact]
     public void A_side_effect_with_no_executor_is_refused_naming_its_type_and_module()
     {
         var rules = BaselineWith(new FakeModule("TEST.DOMAIN", effects: new IPostAssignmentEffectRule[] { DomainEffect() }));
@@ -219,9 +181,6 @@ public class MaterialRuleSetTests
 
         rules.EnsureExecutorsFor(new[] { SyncCoatingDisplayMaterialEffectRule.InstructionType, DomainInstructionType });
     }
-
-    private static IEnumerable<BANxOpen.Foundation.Contracts.Materials.Material> Candidates() =>
-        new[] { "2024-O", "5052-O", "7075-T6" }.Select(name => TestFixtures.MakeMaterial(name));
 
     private sealed class FakeModule : IMaterialRuleModule
     {

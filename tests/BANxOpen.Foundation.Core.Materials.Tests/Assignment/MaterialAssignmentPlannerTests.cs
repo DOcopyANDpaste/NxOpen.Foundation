@@ -67,23 +67,6 @@ public class MaterialAssignmentPlannerTests
     }
 
     [Fact]
-    public void AssignmentPlan_RequiresAnyConfirmation_TrueWhenAnyBodyNeedsConfirmation()
-    {
-        var confirmRule = new TestFixtures.FakeGateRule("confirm", 100, ctx =>
-            ctx.TargetBody.Id.Value == "needs-confirm"
-                ? new RuleOutcome("confirm", RuleDecision.RequireConfirmation, "C", "c")
-                : new RuleOutcome("confirm", RuleDecision.Allow, null, null));
-        var planner = new MaterialAssignmentPlanner(new IMaterialValidationRule[] { confirmRule });
-
-        var plan = planner.Plan(new MaterialAssignmentPlanningInput(
-            MakeMaterial(),
-            new[] { MakeBody("clean"), MakeBody("needs-confirm") },
-            new Dictionary<BodyId, BodyMaterialAssignment>()));
-
-        Assert.True(plan.RequiresAnyConfirmation);
-    }
-
-    [Fact]
     public void Plan_PassesTheRequestedVariantToTheGateRules()
     {
         string? seen = null;

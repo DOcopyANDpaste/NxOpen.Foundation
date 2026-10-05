@@ -9,7 +9,7 @@ namespace BANxOpen.Foundation.Core.Materials.Library;
 /// <see cref="MaterialLibraryId"/> returns the cached result without touching the repository or parser
 /// again. Not thread-safe — callers are expected to be single-threaded/modal, so a plain dictionary is
 /// enough; revisit if that assumption ever changes.</summary>
-public sealed class CachingMaterialLibraryLoader : IMaterialLibraryLoader
+public sealed class CachingMaterialLibraryLoader
 {
     private readonly IMaterialLibraryRepository _repository;
     private readonly IMaterialLibraryParser _parser;

@@ -25,7 +25,7 @@ internal static class CoatingPropertyReader
     /// TODO: placeholder — replace with the real default RGB.</summary>
     public static readonly double[] DefaultDisplayMaterialRgb = { 0.7, 0.7, 0.7 };
 
-    public static MaterialPropertyValue? FindProperty(Material material, string propertyName) =>
+    private static MaterialPropertyValue? FindProperty(Material material, string propertyName) =>
         material.Properties.FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>The coating display material name, or null if the property is missing or blank.</summary>

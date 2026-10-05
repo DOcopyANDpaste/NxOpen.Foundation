@@ -10,14 +10,7 @@ namespace BANxOpen.Foundation.Core.Materials.Rules.Features;
 /// rather than confirmed, so this has to run before anything that asks the user a question.
 ///
 /// <see cref="MaterialRuleSet"/> adds exactly one of these, fed by every module's feature constraints. With no
-/// providers registered it is a no-op that always allows, so it costs nothing until a feature domain opts in.
-///
-/// Deliberately stateless — it queries the providers on every evaluation. The planner evaluates each body
-/// exactly once per plan, so an Apply pays for one provider call per body either way. Repeatedly planning
-/// the same body against many candidate materials (which is what filtering a library does) is the case
-/// that would benefit from memoisation, and that is what <see cref="CachingFeatureConstraintProvider"/>
-/// is for: the caller decides its lifetime, so a cache can never outlive the model state it was read
-/// from.</summary>
+/// providers registered it is a no-op that always allows, so it costs nothing until a feature domain opts in.</summary>
 public sealed class FeatureConstraintGateRule : IMaterialValidationRule
 {
     public const string Id = "FEATURE_MATERIAL_CONSTRAINT";
@@ -40,7 +33,7 @@ public sealed class FeatureConstraintGateRule : IMaterialValidationRule
     /// them at once rather than one per attempt.</summary>
     public RuleOutcome Evaluate(MaterialAssignmentRuleContext context)
     {
-        var candidate = MaterialCandidate.FromLibrary(context.RequestedMaterial);
+        var material = context.RequestedMaterial;
         MaterialConstraint? firstWarning = null;
         var warningMessages = new List<string>();
 
@@ -48,10 +41,10 @@ public sealed class FeatureConstraintGateRule : IMaterialValidationRule
         {
             foreach (var constraint in provider.ConstraintsFor(context.TargetBody.Id))
             {
-                if (constraint.IsSatisfiedBy(candidate))
+                if (constraint.IsSatisfiedBy(material))
                     continue;
 
-                var message = $"{constraint.DescribeViolation(candidate)} (required by {constraint.SourceLabel})";
+                var message = $"{constraint.DescribeViolation(material)} (required by {constraint.SourceLabel})";
 
                 if (constraint.Severity == ConstraintSeverity.Block)
                     return new RuleOutcome(RuleId, RuleDecision.Block, constraint.ReasonCode, message);

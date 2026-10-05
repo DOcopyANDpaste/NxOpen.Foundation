@@ -2,8 +2,11 @@ using BANxOpen.Foundation.Contracts.Materials;
 
 namespace BANxOpen.Foundation.Core.Materials.Library;
 
-public sealed class MaterialCategoryTreeBuilder : IMaterialCategoryTreeBuilder
+/// <summary>Builds the nested, sorted category tree the material browser renders. The UI layer makes zero
+/// grouping/sorting decisions of its own — it renders exactly what this returns.</summary>
+public sealed class MaterialCategoryTreeBuilder
 {
+    /// <summary>The root nodes of the tree, in render order.</summary>
     public IReadOnlyList<MaterialCategoryNode> Build(BANxOpen.Foundation.Contracts.Materials.MaterialLibrary library)
     {
         var roots = new List<MutableNode>();

@@ -29,12 +29,7 @@ public sealed class BodyResolver
             if (byId.ContainsKey(id))
             {
                 _context.Log.Warn(
-                    $"TRACE Body '{body.Name}' (JournalIdentifier='{body.JournalIdentifier}', Tag={body.Tag}) collides with an already-scanned body on BodyId '{id}' — the earlier body will be overwritten in the lookup.");
-            }
-            else
-            {
-                _context.Log.Info(
-                    $"TRACE Body '{body.Name}' (JournalIdentifier='{body.JournalIdentifier}', Tag={body.Tag}) -> BodyId '{id}'.");
+                    $"Body '{body.Name}' (JournalIdentifier='{body.JournalIdentifier}', Tag={body.Tag}) collides with an already-scanned body on BodyId '{id}' — the earlier body will be overwritten in the lookup.");
             }
 
             byId[id] = body;

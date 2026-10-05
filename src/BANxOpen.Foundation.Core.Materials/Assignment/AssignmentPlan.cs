@@ -7,7 +7,4 @@ namespace BANxOpen.Foundation.Core.Materials.Assignment;
 public sealed record AssignmentPlan(
     string PlanId,
     MaterialId RequestedMaterialId,
-    IReadOnlyList<BodyAssignmentEvaluation> BodyEvaluations)
-{
-    public bool RequiresAnyConfirmation => BodyEvaluations.Any(b => b.RequiresConfirmation);
-}
+    IReadOnlyList<BodyAssignmentEvaluation> BodyEvaluations);

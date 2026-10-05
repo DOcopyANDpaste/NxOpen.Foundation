@@ -13,7 +13,7 @@ namespace BANxOpen.Foundation.Core.Requirements;
 public static class RequirementNaming
 {
     /// <summary>Every requirement the BANxOpen tools write starts with this, so a reader skips everyone else's cheaply.</summary>
-    public const string Prefix = "BA_REQ_";
+    private const string Prefix = "BA_REQ_";
 
     private const string MetadataMarker = "#BA_REQ v1";
 
@@ -30,7 +30,7 @@ public static class RequirementNaming
 
     /// <summary>The line appended to a requirement's description to carry its exact identity. Each value is
     /// URI-escaped, so any key round-trips.</summary>
-    public static string MetadataLine(string domain, string key, string aspect) =>
+    private static string MetadataLine(string domain, string key, string aspect) =>
         $"{MetadataMarker} domain={Uri.EscapeDataString(domain)} key={Uri.EscapeDataString(key)} aspect={Uri.EscapeDataString(aspect)}";
 
     /// <summary>The description as written to NX: the domain's own lines, then the bookkeeping line.</summary>

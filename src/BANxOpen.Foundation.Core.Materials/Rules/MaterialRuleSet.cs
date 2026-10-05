@@ -18,15 +18,13 @@ namespace BANxOpen.Foundation.Core.Materials.Rules;
 /// refusal from one domain still beats a warning from another, and every warning is shown at once.</summary>
 public sealed class MaterialRuleSet
 {
-    private readonly IReadOnlyList<IMaterialValidationRule> _moduleValidationRules;
-    private readonly IReadOnlyList<IFeatureMaterialConstraintProvider> _featureConstraints;
-
     private MaterialRuleSet(IReadOnlyList<IMaterialRuleModule> modules)
     {
         Modules = modules;
-        _moduleValidationRules = modules.SelectMany(m => m.ValidationRules).ToList();
-        _featureConstraints = modules.SelectMany(m => m.FeatureConstraints).ToList();
-        ValidationRules = WithFeatureGate(_featureConstraints);
+        ValidationRules = modules.SelectMany(m => m.ValidationRules)
+            .Append(new FeatureConstraintGateRule(modules.SelectMany(m => m.FeatureConstraints)))
+            .OrderBy(r => r.Order)
+            .ToList();
         SideEffectRules = modules.SelectMany(m => m.SideEffectRules).OrderBy(r => r.Order).ToList();
     }
 
@@ -85,14 +83,7 @@ public sealed class MaterialRuleSet
     /// <summary>Every side-effect rule in evaluation order.</summary>
     public IReadOnlyList<IPostAssignmentEffectRule> SideEffectRules { get; }
 
-    /// <param name="cacheFeatureConstraints">Memoise each body's feature constraints for the planner's lifetime.
-    /// For planning one body against many candidate materials (<see cref="AssignableMaterialQuery"/>); create a new
-    /// planner for each such query, since constraints come from live model state — see
-    /// <see cref="CachingFeatureConstraintProvider"/>.</param>
-    public IMaterialAssignmentPlanner CreatePlanner(bool cacheFeatureConstraints = false) =>
-        new MaterialAssignmentPlanner(cacheFeatureConstraints
-            ? WithFeatureGate(CachingFeatureConstraintProvider.WrapAll(_featureConstraints))
-            : ValidationRules);
+    public IMaterialAssignmentPlanner CreatePlanner() => new MaterialAssignmentPlanner(ValidationRules);
 
     public IAssignmentPlanFinalizer CreateFinalizer() => new AssignmentPlanFinalizer(SideEffectRules);
 
@@ -116,10 +107,4 @@ public sealed class MaterialRuleSet
                 "Register the executor with the module that owns the rule.");
         }
     }
-
-    private IReadOnlyList<IMaterialValidationRule> WithFeatureGate(IEnumerable<IFeatureMaterialConstraintProvider> providers) =>
-        _moduleValidationRules
-            .Append(new FeatureConstraintGateRule(providers))
-            .OrderBy(r => r.Order)
-            .ToList();
 }
