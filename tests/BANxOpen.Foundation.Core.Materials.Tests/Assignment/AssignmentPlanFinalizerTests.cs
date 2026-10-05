@@ -1,5 +1,4 @@
 using BANxOpen.Foundation.Core.Materials.Assignment;
-using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
 using BANxOpen.Foundation.Core.Materials.Bodies;
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Core.RuleEngine;
@@ -108,152 +107,24 @@ public class AssignmentPlanFinalizerTests
         Assert.Equal(new[] { "TYPE_A", "TYPE_B" }, assignment.SideEffects.Select(e => e.InstructionType));
     }
 
-    // ---- Choice answers ----
-
     [Fact]
-    public void Finalize_PassesTheChoiceAnswersToTheEffectRules()
+    public void Finalize_PassesTheRequestedVariantToTheEffectRules()
     {
         var plan = MakePlan(Allowed("b1"));
-        var input = new MaterialAssignmentPlanningInput(MakeMaterial(), new[] { MakeBody("b1") }, new Dictionary<BodyId, BodyMaterialAssignment>());
+        var input = new MaterialAssignmentPlanningInput(MakeMaterial(), new[] { MakeBody("b1") }, new Dictionary<BodyId, BodyMaterialAssignment>())
+        {
+            RequestedVariant = "row-1",
+        };
 
         string? seen = null;
         var effectRule = new FakeEffectRule("effect", 100, ctx =>
         {
-            ctx.ChoiceAnswers.TryGet("TEST.CHOICE", ctx.TargetBody.Id, out var option);
-            seen = option;
-            return Array.Empty<SideEffectInstruction>();
-        });
-
-        var answers = AssignmentChoiceAnswers.CreateBuilder()
-            .AnswerDirectly("TEST.CHOICE", new BodyId("b1"), "picked")
-            .Build();
-
-        new AssignmentPlanFinalizer(new[] { effectRule }).Finalize(plan, input, new HashSet<BodyId>(), answers);
-
-        Assert.Equal("picked", seen);
-    }
-
-    [Fact]
-    public void Finalize_WithoutAnswersLeavesTheRulesAnEmptyBagRatherThanNull()
-    {
-        var plan = MakePlan(Allowed("b1"));
-        var input = new MaterialAssignmentPlanningInput(MakeMaterial(), new[] { MakeBody("b1") }, new Dictionary<BodyId, BodyMaterialAssignment>());
-
-        var effectRule = new FakeEffectRule("effect", 100, ctx =>
-        {
-            Assert.False(ctx.ChoiceAnswers.TryGet("TEST.CHOICE", ctx.TargetBody.Id, out _));
+            seen = ctx.RequestedVariant;
             return Array.Empty<SideEffectInstruction>();
         });
 
         new AssignmentPlanFinalizer(new[] { effectRule }).Finalize(plan, input, new HashSet<BodyId>());
 
-        Assert.Equal(new[] { "b1" }, effectRule.InvokedForBodies.Select(b => b.Value));
-    }
-
-    [Fact]
-    public void Finalize_SkipsABodyWhoseChoiceWasRaisedAndNeverAnswered()
-    {
-        // The effect rules would run without something they said they needed, producing a half-done
-        // assignment — in the sheet metal case, a body that gets its material while the part's preferences
-        // are left pointing at the old one.
-        var plan = MakePlan(Allowed("answered"), Allowed("unanswered"));
-        var bodies = new[] { MakeBody("answered"), MakeBody("unanswered") };
-        var input = new MaterialAssignmentPlanningInput(MakeMaterial(), bodies, new Dictionary<BodyId, BodyMaterialAssignment>());
-
-        var answers = AssignmentChoiceAnswers.CreateBuilder()
-            .AnswerDirectly(AlwaysAsks.Id, new BodyId("answered"), "x")
-            .Build();
-
-        var executablePlan = new AssignmentPlanFinalizer(Array.Empty<IPostAssignmentEffectRule>(), new[] { new AlwaysAsks() })
-            .Finalize(plan, input, new HashSet<BodyId>(), answers);
-
-        Assert.Equal(new[] { "answered" }, executablePlan.Assignments.Select(a => a.BodyId.Value));
-        Assert.Equal(new[] { "unanswered" }, executablePlan.SkippedUnresolvedChoice.Select(b => b.Value));
-
-        // Kept apart from the declined list: this is a caller that forgot to ask, not a user who said no.
-        Assert.Empty(executablePlan.SkippedDeclinedConfirmation);
-    }
-
-    [Fact]
-    public void Finalize_WithoutAnswersSkipsEveryBodyAProviderAsksAbout()
-    {
-        // A caller that never ran the collector must not assign bodies whose choices went unasked.
-        var plan = MakePlan(Allowed("b1"));
-        var input = new MaterialAssignmentPlanningInput(MakeMaterial(), new[] { MakeBody("b1") }, new Dictionary<BodyId, BodyMaterialAssignment>());
-
-        var executablePlan = new AssignmentPlanFinalizer(Array.Empty<IPostAssignmentEffectRule>(), new[] { new AlwaysAsks() })
-            .Finalize(plan, input, new HashSet<BodyId>());
-
-        Assert.Empty(executablePlan.Assignments);
-        Assert.Equal(new[] { "b1" }, executablePlan.SkippedUnresolvedChoice.Select(b => b.Value));
-    }
-
-    [Fact]
-    public void Finalize_SkipsABodyConfirmedAfterTheChoicesWereCollected()
-    {
-        // Collected with nothing confirmed, so "late" was never asked about; confirmed only at finalize time.
-        var plan = MakePlan(Allowed("early"), NeedsConfirmation("late"));
-        var input = new MaterialAssignmentPlanningInput(
-            MakeMaterial(), new[] { MakeBody("early"), MakeBody("late") }, new Dictionary<BodyId, BodyMaterialAssignment>());
-        var providers = new[] { new AlwaysAsks() };
-
-        var pending = new AssignmentChoiceCollector(providers).Collect(plan, input, new HashSet<BodyId>());
-        var builder = AssignmentChoiceAnswers.CreateBuilder();
-        foreach (var question in pending)
-            builder.Answer(question, "x");
-
-        var executablePlan = new AssignmentPlanFinalizer(Array.Empty<IPostAssignmentEffectRule>(), providers)
-            .Finalize(plan, input, new HashSet<BodyId> { new BodyId("late") }, builder.Build());
-
-        Assert.Equal(new[] { "early" }, executablePlan.Assignments.Select(a => a.BodyId.Value));
-        Assert.Equal(new[] { "late" }, executablePlan.SkippedUnresolvedChoice.Select(b => b.Value));
-    }
-
-    [Fact]
-    public void Finalize_TreatsAnAnswerNamingABlockedOptionAsUnanswered()
-    {
-        // A blocked option is listed only to say why it is unavailable; applying it would do what the domain refused.
-        var plan = MakePlan(Allowed("blocked-pick"), Allowed("open-pick"));
-        var bodies = new[] { MakeBody("blocked-pick"), MakeBody("open-pick") };
-        var input = new MaterialAssignmentPlanningInput(MakeMaterial(), bodies, new Dictionary<BodyId, BodyMaterialAssignment>());
-
-        var answers = AssignmentChoiceAnswers.CreateBuilder()
-            .AnswerDirectly(AsksWithBlockedOption.Id, new BodyId("blocked-pick"), "refused")
-            .AnswerDirectly(AsksWithBlockedOption.Id, new BodyId("open-pick"), "ok")
-            .Build();
-
-        var executablePlan = new AssignmentPlanFinalizer(Array.Empty<IPostAssignmentEffectRule>(), new[] { new AsksWithBlockedOption() })
-            .Finalize(plan, input, new HashSet<BodyId>(), answers);
-
-        Assert.Equal(new[] { "open-pick" }, executablePlan.Assignments.Select(a => a.BodyId.Value));
-        Assert.Equal(new[] { "blocked-pick" }, executablePlan.SkippedUnresolvedChoice.Select(b => b.Value));
-    }
-
-    private sealed class AsksWithBlockedOption : IAssignmentChoiceProvider
-    {
-        public const string Id = "TEST.BLOCKING_CHOICE";
-
-        public string ChoiceId => Id;
-
-        public AssignmentChoice? ChoiceFor(MaterialAssignmentRuleContext context) =>
-            new(Id, context.TargetBody.Id, context.TargetBody.Id.Value, "Pick", "Pick",
-                new[] { new AssignmentChoiceColumn("Only") },
-                new[]
-                {
-                    new AssignmentChoiceOption("ok", new[] { "ok" }),
-                    new AssignmentChoiceOption("refused", new[] { "refused" }, BlockReason: "not allowed"),
-                });
-    }
-
-    private sealed class AlwaysAsks : IAssignmentChoiceProvider
-    {
-        public const string Id = "TEST.CHOICE";
-
-        public string ChoiceId => Id;
-
-        public AssignmentChoice? ChoiceFor(MaterialAssignmentRuleContext context) =>
-            new(Id, context.TargetBody.Id, context.TargetBody.Id.Value, "Pick", "Pick",
-                new[] { new AssignmentChoiceColumn("Only") },
-                new[] { new AssignmentChoiceOption("x", new[] { "x" }) });
+        Assert.Equal("row-1", seen);
     }
 }

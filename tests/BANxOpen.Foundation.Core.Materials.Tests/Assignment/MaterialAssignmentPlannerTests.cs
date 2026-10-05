@@ -82,4 +82,19 @@ public class MaterialAssignmentPlannerTests
 
         Assert.True(plan.RequiresAnyConfirmation);
     }
+
+    [Fact]
+    public void Plan_PassesTheRequestedVariantToTheGateRules()
+    {
+        string? seen = null;
+        var rule = new FakeGateRule("r1", 100, ctx => { seen = ctx.RequestedVariant; return new RuleOutcome("r1", RuleDecision.Allow, null, null); });
+
+        new MaterialAssignmentPlanner(new[] { rule }).Plan(new MaterialAssignmentPlanningInput(
+            MakeMaterial(), new[] { MakeBody("b1") }, new Dictionary<BodyId, BodyMaterialAssignment>())
+        {
+            RequestedVariant = "row-1",
+        });
+
+        Assert.Equal("row-1", seen);
+    }
 }

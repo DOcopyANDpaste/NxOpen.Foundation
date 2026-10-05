@@ -1,5 +1,6 @@
 using BANxOpen.Foundation.Core.RuleEngine;
 
+
 namespace BANxOpen.Foundation.Core.Materials.Assignment;
 
 /// <summary>Runs the ordered gate rules for every body in the batch and produces a pure
@@ -21,7 +22,10 @@ public sealed class MaterialAssignmentPlanner : IMaterialAssignmentPlanner
         {
             input.CurrentAssignments.TryGetValue(body.Id, out var currentAssignment);
             var context = new MaterialAssignmentRuleContext(
-                input.RequestedMaterial, body, currentAssignment, input.TargetBodies);
+                input.RequestedMaterial, body, currentAssignment, input.TargetBodies)
+            {
+                RequestedVariant = input.RequestedVariant,
+            };
 
             var outcomes = new List<RuleOutcome>();
             foreach (var rule in _gateRules)

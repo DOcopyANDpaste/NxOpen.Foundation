@@ -13,7 +13,7 @@ public sealed record AssignmentTargetSet(
     IReadOnlyList<BodyId> SkippedDeclinedConfirmation);
 
 /// <summary>Works out which of a plan's bodies will actually be assigned, given the user's confirm/decline
-/// answers. Shared by <see cref="AssignmentPlanFinalizer"/> and <see cref="Choices.AssignmentChoiceCollector"/>.</summary>
+/// answers. Used by <see cref="AssignmentPlanFinalizer"/>.</summary>
 public static class AssignmentTargets
 {
     public static AssignmentTargetSet Select(

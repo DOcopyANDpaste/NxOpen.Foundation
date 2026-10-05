@@ -1,7 +1,6 @@
 using BANxOpen.Foundation.Contracts.Bodies;
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Core.Materials.Assignment;
-using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
 using BANxOpen.Foundation.Core.Materials.Rules;
 using BANxOpen.Foundation.Core.Materials.Rules.Display;
 using BANxOpen.Foundation.Core.Materials.Rules.Features;
@@ -97,14 +96,6 @@ public class MaterialRuleSetTests
     }
 
     [Fact]
-    public void Physical_property_sync_stays_unregistered()
-    {
-        // It generates SYNC_PHYSICAL_PROPERTY instructions that nothing executes. Kept, but deliberately
-        // not wired -- see StandardRuleModule.
-        Assert.DoesNotContain(BaselineWith().SideEffectRules, r => r is SyncPhysicalPropertiesEffectRule);
-    }
-
-    [Fact]
     public void Coating_sync_is_registered_so_every_entry_point_colours_bodies_the_same_way()
     {
         Assert.Contains(BaselineWith().SideEffectRules, r => r is SyncCoatingDisplayMaterialEffectRule);
@@ -153,30 +144,6 @@ public class MaterialRuleSetTests
 
         Assert.Contains("CONFIRM_REASSIGNMENT", ex.Message);
         Assert.Contains(StandardRuleModule.Id, ex.Message);
-    }
-
-    [Fact]
-    public void A_choice_id_already_registered_by_another_module_is_refused()
-    {
-        // Answers are keyed by choice id, so two providers sharing one would each read the other's answer.
-        var first = new FakeModule("TEST.A", choices: new IAssignmentChoiceProvider[] { new FakeChoiceProvider("PICK") });
-        var second = new FakeModule("TEST.B", choices: new IAssignmentChoiceProvider[] { new FakeChoiceProvider("PICK") });
-
-        var ex = Assert.Throws<ArgumentException>(() => BaselineWith(first, second));
-
-        Assert.Contains("PICK", ex.Message);
-        Assert.Contains("TEST.A", ex.Message);
-    }
-
-    [Fact]
-    public void The_choice_collector_is_built_from_every_modules_providers()
-    {
-        var rules = BaselineWith(
-            new FakeModule("TEST.A", choices: new IAssignmentChoiceProvider[] { new FakeChoiceProvider("PICK_A") }),
-            new FakeModule("TEST.B", choices: new IAssignmentChoiceProvider[] { new FakeChoiceProvider("PICK_B") }));
-
-        Assert.Equal(new[] { "PICK_A", "PICK_B" }, rules.ChoiceProviders.Select(p => p.ChoiceId));
-        Assert.NotNull(rules.CreateChoiceCollector());
     }
 
     [Fact]
@@ -262,14 +229,12 @@ public class MaterialRuleSetTests
             string moduleId,
             IMaterialValidationRule[]? validation = null,
             IFeatureMaterialConstraintProvider[]? constraints = null,
-            IPostAssignmentEffectRule[]? effects = null,
-            IAssignmentChoiceProvider[]? choices = null)
+            IPostAssignmentEffectRule[]? effects = null)
         {
             ModuleId = moduleId;
             ValidationRules = validation ?? Array.Empty<IMaterialValidationRule>();
             FeatureConstraints = constraints ?? Array.Empty<IFeatureMaterialConstraintProvider>();
             SideEffectRules = effects ?? Array.Empty<IPostAssignmentEffectRule>();
-            ChoiceProviders = choices ?? Array.Empty<IAssignmentChoiceProvider>();
         }
 
         public string ModuleId { get; }
@@ -279,16 +244,5 @@ public class MaterialRuleSetTests
         public IReadOnlyList<IFeatureMaterialConstraintProvider> FeatureConstraints { get; }
 
         public IReadOnlyList<IPostAssignmentEffectRule> SideEffectRules { get; }
-
-        public IReadOnlyList<IAssignmentChoiceProvider> ChoiceProviders { get; }
-    }
-
-    private sealed class FakeChoiceProvider : IAssignmentChoiceProvider
-    {
-        public FakeChoiceProvider(string choiceId) => ChoiceId = choiceId;
-
-        public string ChoiceId { get; }
-
-        public AssignmentChoice? ChoiceFor(MaterialAssignmentRuleContext context) => null;
     }
 }

@@ -9,9 +9,4 @@ public sealed record ExecutablePlan(
     string PlanId,
     IReadOnlyList<ExecutableAssignment> Assignments,
     IReadOnlyList<BodyId> SkippedBlocked,
-    IReadOnlyList<BodyId> SkippedDeclinedConfirmation)
-{
-    /// <summary>Bodies a <see cref="Choices.IAssignmentChoiceProvider"/> raised a question about that never got
-    /// an answer — a caller wiring mistake, not a user decision.</summary>
-    public IReadOnlyList<BodyId> SkippedUnresolvedChoice { get; init; } = Array.Empty<BodyId>();
-}
+    IReadOnlyList<BodyId> SkippedDeclinedConfirmation);

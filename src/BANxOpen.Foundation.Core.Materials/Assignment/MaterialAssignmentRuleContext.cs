@@ -1,5 +1,3 @@
-using BANxOpen.Foundation.Core.Materials.Assignment.Choices;
-using BANxOpen.Foundation.Core.Materials.Bodies;
 using BANxOpen.Foundation.Contracts.Materials;
 using BANxOpen.Foundation.Contracts.Bodies;
 
@@ -14,7 +12,6 @@ public sealed record MaterialAssignmentRuleContext(
     BodyMaterialAssignment? CurrentAssignment,
     IReadOnlyList<BodyInfo> AllTargetBodiesInBatch)
 {
-    /// <summary>What the user picked for the questions the <see cref="IAssignmentChoiceProvider"/>s raised. Set
-    /// only by <see cref="AssignmentPlanFinalizer"/>; always empty while planning.</summary>
-    public AssignmentChoiceAnswers ChoiceAnswers { get; init; } = AssignmentChoiceAnswers.Empty;
+    /// <summary>See <see cref="MaterialAssignmentPlanningInput.RequestedVariant"/>.</summary>
+    public string? RequestedVariant { get; init; }
 }
