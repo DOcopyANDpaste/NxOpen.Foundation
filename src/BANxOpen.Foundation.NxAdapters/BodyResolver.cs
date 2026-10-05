@@ -1,14 +1,11 @@
-using BANxOpen.Foundation.Core.Materials.Bodies;
 using BANxOpen.Foundation.Contracts.Common;
 using NXOpen;
-using BANxOpen.Foundation.NxAdapters;
 
-namespace BANxOpen.Foundation.NxAdapters.Materials;
+namespace BANxOpen.Foundation.NxAdapters;
 
 /// <summary>Maps between the plain-string <see cref="BodyId"/> used across Core and live NXOpen
-/// <see cref="Body"/> objects in the work part. Every <see cref="IPartMaterialService"/>
-/// method that promises a fresh rescan calls <see cref="Refresh"/> first, so this cache never survives
-/// across calls.</summary>
+/// <see cref="Body"/> objects in the work part. Callers that need live state call <see cref="Refresh"/> first,
+/// so this cache never survives across calls.</summary>
 public sealed class BodyResolver
 {
     private readonly NxSessionContext _context;

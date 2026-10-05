@@ -2,7 +2,7 @@ namespace BANxOpen.Foundation.Core.RuleEngine;
 
 /// <summary>A gate rule: decides whether an action is allowed, blocked, or needs user confirmation.
 /// Implement this to add a new business rule without touching the planner or any other rule — that's
-/// the whole point of the pipeline. Generalized from this repo's original IMaterialAssignmentRule.</summary>
+/// the whole point of the pipeline.</summary>
 public interface IGateRule<in TContext, out TOutcome>
 {
     string RuleId { get; }
