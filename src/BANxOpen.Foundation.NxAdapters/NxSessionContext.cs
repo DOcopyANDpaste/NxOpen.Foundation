@@ -33,7 +33,15 @@ public sealed class NxSessionContext
 
     public NxListingLog Log { get; }
 
-    private NxSessionContext(Session session, UI ui, Part workPart, UFSession ufSession, NxSessionMode mode, NxListingLog log)
+    /// <summary>The NX application the session was in when the tool launched, as <c>Session.ApplicationName</c>
+    /// reports it (e.g. <see cref="NxApplicationNames.SheetMetal"/>). Empty when NX could not say.</summary>
+    private string CurrentApplication { get; }
+
+    public bool IsSheetMetalApplication =>
+        string.Equals(CurrentApplication, NxApplicationNames.SheetMetal, StringComparison.OrdinalIgnoreCase);
+
+    private NxSessionContext(
+        Session session, UI ui, Part workPart, UFSession ufSession, NxSessionMode mode, NxListingLog log, string currentApplication)
     {
         Session = session;
         Ui = ui;
@@ -41,6 +49,7 @@ public sealed class NxSessionContext
         UFSession = ufSession;
         Mode = mode;
         Log = log;
+        CurrentApplication = currentApplication;
     }
 
     public static bool TryInitialize(
@@ -73,7 +82,9 @@ public sealed class NxSessionContext
             var mode = DetectSessionMode(ufSession);
             var log = new NxListingLog(session);
 
-            context = new NxSessionContext(session, UI.GetUI(), workPart, ufSession, mode, log);
+            var application = DetectApplication(session, log);
+
+            context = new NxSessionContext(session, UI.GetUI(), workPart, ufSession, mode, log, application);
             return true;
         }
         catch (NXException ex)
@@ -90,5 +101,23 @@ public sealed class NxSessionContext
     {
         ufSession.UF.IsUgmanagerActive(out var isManaged);
         return isManaged ? NxSessionMode.TeamcenterManaged : NxSessionMode.Native;
+    }
+
+    // Logged every launch: the application names are NX-internal strings, so the Listing Window is how a new NX
+    // version's names get confirmed. A failure here only loses application-specific behaviour, so it does not
+    // stop the tool.
+    private static string DetectApplication(Session session, NxListingLog log)
+    {
+        try
+        {
+            var application = session.ApplicationName ?? string.Empty;
+            log.Info($"NX application: '{application}'.");
+            return application;
+        }
+        catch (NXException ex)
+        {
+            log.Warn($"The current NX application could not be read ({ex.Message}); application-specific behaviour is off.");
+            return string.Empty;
+        }
     }
 }
