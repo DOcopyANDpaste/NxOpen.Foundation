@@ -50,6 +50,26 @@ public class RequirementDiffTests
     }
 
     [Fact]
+    public void Compute_MatchesByIdentity_SoAStemOnlyOnTheWantedSpecChangesNothing()
+    {
+        // Read back from NX, a spec has no stem; the same requirement wanted again has one.
+        var existing = Spec(key: "STD|B1");
+        var wanted = existing with { NameStem = "BEAD_B1" };
+
+        Assert.True(RequirementDiff.Compute(new[] { existing }, new[] { wanted }).IsEmpty);
+    }
+
+    [Fact]
+    public void Compute_RefusesStemsThatCollapseToOneName()
+    {
+        var diff = RequirementDiff.Compute(
+            Array.Empty<RequirementSpec>(),
+            new[] { Spec(key: "STD1|B1") with { NameStem = "BEAD_B1" }, Spec(key: "STD2|B1") with { NameStem = "BEAD_B1" } });
+
+        Assert.NotEmpty(diff.Errors);
+    }
+
+    [Fact]
     public void Compute_RefusesKeysThatCollapseToOneName()
     {
         var diff = RequirementDiff.Compute(Array.Empty<RequirementSpec>(), new[] { Spec(key: "A-1"), Spec(key: "A_1") });

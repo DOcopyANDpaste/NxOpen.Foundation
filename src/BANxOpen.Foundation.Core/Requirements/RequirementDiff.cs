@@ -35,31 +35,35 @@ public sealed record RequirementDiff(
                 Array.Empty<RequirementSpec>(), errors);
         }
 
-        var existingByName = existing
-            .GroupBy(RequirementNaming.Name, StringComparer.Ordinal)
-            .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
-        var wantedNames = new HashSet<string>(wanted.Select(RequirementNaming.Name), StringComparer.Ordinal);
+        // Matched by identity, not by NX name: a spec read back from a part carries no NameStem, so its name can differ
+        // from the wanted one for the very same requirement. Renaming one that is otherwise unchanged is the store's job.
+        var existingByIdentity = existing
+            .GroupBy(Identity)
+            .ToDictionary(g => g.Key, g => g.First());
+        var wantedIdentities = new HashSet<(string, string, string)>(wanted.Select(Identity));
 
         var toCreate = new List<RequirementSpec>();
         var toReplace = new List<(RequirementSpec, RequirementSpec)>();
         foreach (var spec in wanted)
         {
-            if (!existingByName.TryGetValue(RequirementNaming.Name(spec), out var current))
+            if (!existingByIdentity.TryGetValue(Identity(spec), out var current))
                 toCreate.Add(spec);
             else if (!AreEquivalent(current, spec))
                 toReplace.Add((current, spec));
         }
 
-        // Unwanted names go entirely. A wanted name the part holds more than once (a hand-copied requirement, say)
-        // keeps only the first, which the name lookup above compared against.
+        // Unwanted identities go entirely. A wanted one the part holds more than once (a hand-copied requirement, say)
+        // keeps only the first, which the lookup above compared against.
         var toDelete = new List<RequirementSpec>();
-        foreach (var group in existing.GroupBy(RequirementNaming.Name, StringComparer.Ordinal))
-            toDelete.AddRange(wantedNames.Contains(group.Key) ? group.Skip(1) : group);
+        foreach (var group in existing.GroupBy(Identity))
+            toDelete.AddRange(wantedIdentities.Contains(group.Key) ? group.Skip(1) : group);
 
         return new RequirementDiff(toCreate, toReplace, toDelete, Array.Empty<string>());
     }
 
-    /// <summary>Whether two specs would leave the same thing in NX. Value lists compare in order — the order is what
+    private static (string Domain, string Key, string Aspect) Identity(RequirementSpec spec) => (spec.Domain, spec.Key, spec.Aspect);
+
+    /// <summary>Whether two specs would leave the same thing in NX, the name aside. Value lists compare in order — the order is what
     /// NX shows — while associated objects compare as a set, since NX does not keep their order.</summary>
     private static bool AreEquivalent(RequirementSpec a, RequirementSpec b) =>
         a.Domain == b.Domain

@@ -37,6 +37,23 @@ public sealed class NxSessionContext
     /// reports it (e.g. <see cref="NxApplicationNames.SheetMetal"/>). Empty when NX could not say.</summary>
     private string CurrentApplication { get; }
 
+    /// <summary>Whether <paramref name="tag"/> names a live object — not deleted, condemned, temporary or never valid.
+    /// For cleanup that must not touch an object NX already freed.</summary>
+    public bool IsAlive(Tag tag)
+    {
+        if (tag == Tag.Null)
+            return false;
+
+        try
+        {
+            return UFSession.Obj.AskStatus(tag) == UFConstants.UF_OBJ_ALIVE;
+        }
+        catch (NXException)
+        {
+            return false;
+        }
+    }
+
     public bool IsSheetMetalApplication =>
         string.Equals(CurrentApplication, NxApplicationNames.SheetMetal, StringComparison.OrdinalIgnoreCase);
 
@@ -80,7 +97,7 @@ public sealed class NxSessionContext
 
             var ufSession = UFSession.GetUFSession();
             var mode = DetectSessionMode(ufSession);
-            var log = new NxListingLog(session);
+            var log = NxListingLog.FromEnvironment(session);
 
             var application = DetectApplication(session, log);
 
@@ -103,15 +120,15 @@ public sealed class NxSessionContext
         return isManaged ? NxSessionMode.TeamcenterManaged : NxSessionMode.Native;
     }
 
-    // Logged every launch: the application names are NX-internal strings, so the Listing Window is how a new NX
-    // version's names get confirmed. A failure here only loses application-specific behaviour, so it does not
+    // Logged every launch: the application names are NX-internal strings, so the log is how a new NX version's names
+    // get confirmed. A failure here only loses application-specific behaviour, so it does not
     // stop the tool.
     private static string DetectApplication(Session session, NxListingLog log)
     {
         try
         {
             var application = session.ApplicationName ?? string.Empty;
-            log.Info($"NX application: '{application}'.");
+            log.Debug($"NX application: '{application}'.");
             return application;
         }
         catch (NXException ex)

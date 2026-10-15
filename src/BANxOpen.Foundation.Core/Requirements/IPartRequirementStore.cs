@@ -18,5 +18,11 @@ public interface IPartRequirementStore
     ///
     /// Callers run this inside their own undo mark: a failure part-way leaves the part half-written, and only the
     /// caller's rollback puts it back.</summary>
+    /// <remarks>Kept requirements are renamed to the current naming, and every check the domain owns is evaluated, so
+    /// none is left showing Unknown.</remarks>
     OperationResult Refresh(string domain, IReadOnlyList<RequirementSpec> current);
+
+    /// <summary>Diagnostic: one line per requirement <paramref name="domain"/> owns, naming every object its check holds
+    /// and whether it is still alive.</summary>
+    IReadOnlyList<string> Audit(string domain);
 }

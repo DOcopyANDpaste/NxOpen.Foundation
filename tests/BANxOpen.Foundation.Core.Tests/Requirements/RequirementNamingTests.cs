@@ -44,9 +44,26 @@ public class RequirementNamingTests
     }
 
     [Fact]
+    public void Name_UsesTheNameStemInPlaceOfDomainAndKey()
+    {
+        var spec = Spec(domain: "SHEETMETAL.BEAD", key: "BOMBARDIER B-STANDARDS|B1005010-3", aspect: "GRADE") with
+        {
+            NameStem = "BEAD_B1005010-3",
+        };
+
+        Assert.Equal("BA_REQ_BEAD_B1005010_3_GRADE", RequirementNaming.Name(spec));
+    }
+
+    [Fact]
+    public void Name_WithoutAStem_IsBuiltFromTheIdentity()
+    {
+        Assert.Equal("BA_REQ_D_K_A", RequirementNaming.Name(Spec()));
+    }
+
+    [Fact]
     public void CheckName_DerivesFromTheRequirementName()
     {
-        Assert.Equal("BA_REQ_X_Y_Z_CHECK", RequirementNaming.CheckName("BA_REQ_X_Y_Z"));
+        Assert.Equal("BA_REQ_X_Y_Z_CHK", RequirementNaming.CheckName("BA_REQ_X_Y_Z"));
     }
 
     internal static RequirementSpec Spec(

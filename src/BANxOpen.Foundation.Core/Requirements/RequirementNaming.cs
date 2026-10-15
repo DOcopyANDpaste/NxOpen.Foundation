@@ -23,10 +23,15 @@ public static class RequirementNaming
     public static string Name(string domain, string key, string aspect) =>
         $"{Prefix}{Token(domain)}_{Token(key)}_{Token(aspect)}";
 
-    public static string Name(RequirementSpec spec) => Name(spec.Domain, spec.Key, spec.Aspect);
+    /// <summary>From <see cref="RequirementSpec.NameStem"/> when the spec has one — <c>BA_REQ_&lt;STEM&gt;_&lt;ASPECT&gt;</c> —
+    /// else from its identity as above.</summary>
+    public static string Name(RequirementSpec spec) =>
+        string.IsNullOrEmpty(spec.NameStem)
+            ? Name(spec.Domain, spec.Key, spec.Aspect)
+            : $"{Prefix}{Token(spec.NameStem!)}_{Token(spec.Aspect)}";
 
     /// <summary>The name of the Requirement Check that links a requirement to its checked expression.</summary>
-    public static string CheckName(string requirementName) => $"{requirementName}_CHECK";
+    public static string CheckName(string requirementName) => $"{requirementName}_CHK";
 
     /// <summary>The line appended to a requirement's description to carry its exact identity. Each value is
     /// URI-escaped, so any key round-trips.</summary>

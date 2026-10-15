@@ -30,7 +30,8 @@ public sealed record EqualsValueRule(double Value, double Tolerance) : Requireme
 ///
 /// Identity is (<see cref="Domain"/>, <see cref="Key"/>, <see cref="Aspect"/>): a domain owns every requirement it
 /// wrote, a key groups the requirements one source imposes (a bead SPEC, say), and the aspect tells them apart
-/// (grade, thickness). The NX object name is derived from the identity, so it is never stored separately.</summary>
+/// (grade, thickness). The NX object name is derived from the identity — or from <see cref="NameStem"/> when the domain
+/// gives a shorter one — so it is never stored separately.</summary>
 /// <param name="Domain">Owning domain, e.g. "SHEETMETAL.BEAD". A store only ever touches its own domain's
 /// requirements.</param>
 /// <param name="Key">What imposes the requirement within the domain, e.g. "BA|B1005010-2".</param>
@@ -40,6 +41,9 @@ public sealed record EqualsValueRule(double Value, double Tolerance) : Requireme
 /// bookkeeping line and strips it again on read.</param>
 /// <param name="AssociatedObjectKeys">The objects NX highlights for the check — tag values as strings, the same form
 /// a feature inventory's feature keys take. Order-insensitive.</param>
+/// <param name="NameStem">What the NX name is built from in place of the domain and key, e.g. "BEAD_B1005010-2", for a
+/// domain whose full identity makes too long a name. Only the name: identity, and so ownership, stay
+/// (Domain, Key, Aspect). Not read back from NX — a spec read from a part has none.</param>
 public sealed record RequirementSpec(
     string Domain,
     string Key,
@@ -49,7 +53,8 @@ public sealed record RequirementSpec(
     RequirementSeverity Severity,
     string CheckedFormula,
     IReadOnlyList<string> Description,
-    IReadOnlyList<string> AssociatedObjectKeys);
+    IReadOnlyList<string> AssociatedObjectKeys,
+    string? NameStem = null);
 
 /// <summary>NX's last verdict on a requirement's check. Mirrors <c>NXOpen.Validation.Result</c>.</summary>
 public enum RequirementStatus

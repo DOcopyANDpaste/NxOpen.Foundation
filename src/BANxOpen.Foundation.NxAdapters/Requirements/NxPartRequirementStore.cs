@@ -52,6 +52,7 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
         if (diff.Errors.Count > 0)
             return OperationResult.Fail("REQUIREMENT_NAME_CONFLICT", string.Join(" ", diff.Errors));
 
+        var renamed = 0;
         try
         {
             foreach (var spec in diff.ToDelete.Concat(diff.ToReplace.Select(r => r.Existing)))
@@ -59,6 +60,15 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
 
             foreach (var spec in diff.ToCreate.Concat(diff.ToReplace.Select(r => r.Wanted)))
                 Create(spec);
+
+            // Unchanged ones still take the current naming (a part written before NameStem existed, say). Ownership is
+            // the description's identity line, so renaming loses nothing.
+            var written = new HashSet<RequirementSpec>(diff.ToCreate.Concat(diff.ToReplace.Select(r => r.Wanted)));
+            foreach (var spec in current.Where(s => !written.Contains(s)))
+            {
+                if (owned.FirstOrDefault(o => SameIdentity(o.Spec, spec)) is { } kept && Rename(kept, RequirementNaming.Name(spec)))
+                    renamed++;
+            }
         }
         catch (NXException ex)
         {
@@ -66,18 +76,101 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
             return OperationResult.Fail("REQUIREMENT_WRITE_FAILED", $"NX {ex.ErrorCode}: {ex.Message}");
         }
 
-        if (!diff.IsEmpty)
+        if (!diff.IsEmpty || renamed > 0)
         {
-            _context.Log.Info($"Requirements for '{domain}': {diff.ToCreate.Count} created, {diff.ToReplace.Count} replaced, " +
-                              $"{diff.ToDelete.Count} deleted.");
+            _context.Log.Debug($"Requirements for '{domain}': {diff.ToCreate.Count} created, {diff.ToReplace.Count} replaced, " +
+                               $"{diff.ToDelete.Count} deleted, {renamed} renamed.");
         }
 
+        Evaluate(domain);
         return OperationResult.Success();
     }
 
+    /// <summary>One line per requirement <paramref name="domain"/> owns: its tag, its check's, and every object the
+    /// check is associated with, each as alive or not. A dead tag held by a check is what NX refuses on save
+    /// ("an invalid tag was passed to the tag module").</summary>
+    public IReadOnlyList<string> Audit(string domain)
+    {
+        var lines = new List<string>();
+        var (owned, errors) = ReadOwned(domain);
+        lines.AddRange(errors.Select(e => $"read error: {e}"));
+
+        foreach (var o in owned)
+        {
+            var line = $"{o.NxName} [{TagStatus(o.Requirement.Tag)}]";
+            if (o.Check is not { } check)
+            {
+                lines.Add($"{line}, no check");
+                continue;
+            }
+
+            line += $", check [{TagStatus(check.Tag)}] result {SafeResult(check)}";
+            try
+            {
+                check.GetAssociatedObjects(out var objects);
+                var described = (objects ?? Array.Empty<NXObject>())
+                    .Select(obj => obj is null ? "null" : $"{obj.Tag} {TagStatus(obj.Tag)}")
+                    .ToList();
+                line += $", associated [{string.Join(", ", described)}]";
+            }
+            catch (NXException ex)
+            {
+                line += $", associated objects unreadable: NX {ex.ErrorCode}: {ex.Message}";
+            }
+
+            lines.Add(line);
+        }
+
+        return lines;
+    }
+
+    // ---- Evaluating ----
+
+    /// <summary>Evaluates every check <paramref name="domain"/> owns. A check NX has never evaluated reports Unknown
+    /// until something it watches changes — and a check on an expression outside the update graph (one reading a part
+    /// attribute) may never see a change. One that fails to evaluate is logged; the rest still run.</summary>
+    private void Evaluate(string domain)
+    {
+        var (owned, _) = ReadOwned(domain);
+        foreach (var o in owned)
+        {
+            if (o.Check is not { } check)
+                continue;
+
+            try
+            {
+                check.Evaluate();
+                _context.Log.Debug($"Requirement check '{o.NxName}' evaluated: {SafeResult(check)}.");
+            }
+            catch (NXException ex)
+            {
+                _context.Log.Warn($"Requirement check '{o.NxName}' could not be evaluated: NX {ex.ErrorCode}: {ex.Message}");
+            }
+        }
+    }
+
+    private static string SafeResult(RequirementCheck check)
+    {
+        try
+        {
+            return FromNx(check.GetCheckResult()).ToString();
+        }
+        catch (NXException ex)
+        {
+            return $"unreadable (NX {ex.ErrorCode})";
+        }
+    }
+
+    private string TagStatus(Tag tag) => _context.IsAlive(tag) ? "alive" : "DEAD";
+
+    private bool IsAlive(Tag tag) => _context.IsAlive(tag);
+
+    private static bool SameIdentity(RequirementSpec a, RequirementSpec b) =>
+        a.Domain == b.Domain && a.Key == b.Key && a.Aspect == b.Aspect;
+
     // ---- Reading ----
 
-    private sealed record Owned(RequirementSpec Spec, RequirementStatus Status, Requirement Requirement, RequirementCheck? Check);
+    private sealed record Owned(RequirementSpec Spec, RequirementStatus Status, Requirement Requirement, RequirementCheck? Check, string NxName);
 
     private (List<Owned> Owned, List<string> Errors) ReadOwned(string domain)
     {
@@ -160,7 +253,8 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
                 description,
                 AssociatedKeys(check));
 
-            return new Owned(spec, check is null ? RequirementStatus.Unknown : FromNx(check.GetCheckResult()), requirement, check);
+            return new Owned(spec, check is null ? RequirementStatus.Unknown : FromNx(check.GetCheckResult()), requirement, check,
+                SafeName(requirement));
         }
         finally
         {
@@ -168,13 +262,32 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
         }
     }
 
-    private static IReadOnlyList<string> AssociatedKeys(RequirementCheck? check)
+    /// <summary>The check's associated objects that are still alive. A deleted feature the check still holds is left
+    /// out, so the read no longer matches what is wanted and the next refresh rewrites the check without it.</summary>
+    private IReadOnlyList<string> AssociatedKeys(RequirementCheck? check)
     {
         if (check is null)
             return Array.Empty<string>();
 
         check.GetAssociatedObjects(out var objects);
-        return (objects ?? Array.Empty<NXObject>()).Select(o => o.Tag.ToString()).ToList();
+        var all = (objects ?? Array.Empty<NXObject>()).ToList();
+        var alive = all.Where(o => o is not null && IsAlive(o.Tag)).ToList();
+        if (alive.Count != all.Count)
+            _context.Log.Warn($"Requirement check '{SafeCheckName(check)}' holds {all.Count - alive.Count} deleted object(s); its next refresh drops them.");
+
+        return alive.Select(o => o.Tag.ToString()).ToList();
+    }
+
+    private static string SafeCheckName(RequirementCheck check)
+    {
+        try
+        {
+            return check.CheckName;
+        }
+        catch (NXException)
+        {
+            return $"(tag {check.Tag})";
+        }
     }
 
     // ---- Writing ----
@@ -183,6 +296,20 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
     {
         owned.Check?.Delete();
         owned.Requirement.Delete();
+    }
+
+    /// <summary>Gives a kept requirement, and its check, <paramref name="name"/>. False when it already has it.</summary>
+    private bool Rename(Owned owned, string name)
+    {
+        if (owned.NxName == name)
+            return false;
+
+        owned.Requirement.SetName(name);
+        if (owned.Check is { } check)
+            check.CheckName = RequirementNaming.CheckName(name);
+
+        _context.Log.Debug($"Requirement '{owned.NxName}' renamed to '{name}'.");
+        return true;
     }
 
     private void Create(RequirementSpec spec)
@@ -244,7 +371,9 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
             NXObject? found = null;
             try
             {
-                if (Enum.TryParse<Tag>(key, out var tag))
+                // Alive first: a tag of a deleted object can still come back from the manager, and handing it to the
+                // check leaves a dead reference in the part that fails its save.
+                if (Enum.TryParse<Tag>(key, out var tag) && IsAlive(tag))
                     found = NXOpen.Utilities.NXObjectManager.Get(tag) as NXObject;
             }
             catch (NXException)
