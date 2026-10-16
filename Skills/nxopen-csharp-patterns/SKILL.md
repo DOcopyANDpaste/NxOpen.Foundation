@@ -47,6 +47,7 @@ For a dialog-based tool you read `common.md` + `with-block-ui.md`. For everythin
 4. **No hardcoded install paths.** Reference NXOpen assemblies via an env var (`UGII_BASE_DIR`), never `C:\Program Files\Siemens\...`.
 5. **Explicit Session/Part ownership.** Every generated component states who opens, owns, and closes the part. No ambiguous shared active-part assumptions.
 6. **Plain DTOs cross the Core boundary** — never pass an NXOpen object into or out of Core.
+7. **User-facing text lives in describers.** Domain wording in the library's describer (`FoundationText`, `MaterialsText`, `SheetMetalText`), shared NX dialog wording in `NxDialogText`, app-only wording in the app's `UiText`; return codes + `Args` and show the library's `Message` as-is. No user-facing literals elsewhere; log lines are exempt. See `common.md` §8.
 
 ## Output expectations
 

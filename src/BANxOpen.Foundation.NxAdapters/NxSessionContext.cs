@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using BANxOpen.Foundation.Core;
 using NXOpen;
 using NXOpen.UF;
 
@@ -69,10 +70,14 @@ public sealed class NxSessionContext
         CurrentApplication = currentApplication;
     }
 
+    /// <param name="failureReason">Why the tool cannot start, worded for the user.</param>
+    /// <param name="text">Words <paramref name="failureReason"/>; <see cref="FoundationText.Default"/> when null.</param>
     public static bool TryInitialize(
         [NotNullWhen(true)] out NxSessionContext? context,
-        [NotNullWhen(false)] out string? failureReason)
+        [NotNullWhen(false)] out string? failureReason,
+        FoundationText? text = null)
     {
+        text ??= FoundationText.Default;
         context = null;
         failureReason = null;
 
@@ -84,14 +89,14 @@ public sealed class NxSessionContext
             var session = Session.GetSession();
             if (session is null)
             {
-                failureReason = "No active NX session.";
+                failureReason = text.NoActiveSession;
                 return false;
             }
 
             var workPart = session.Parts.Work;
             if (workPart is null)
             {
-                failureReason = "No active work part. Open a part before launching this tool.";
+                failureReason = text.NoWorkPart;
                 return false;
             }
 
@@ -106,7 +111,7 @@ public sealed class NxSessionContext
         }
         catch (NXException ex)
         {
-            failureReason = $"NX {ex.ErrorCode}: {ex.Message}";
+            failureReason = NxDialogText.Default.NxError(ex);
             return false;
         }
     }

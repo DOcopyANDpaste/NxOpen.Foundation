@@ -3,6 +3,7 @@ using NXOpen;
 using NXOpen.Validate;
 using BANxOpen.Foundation.Contracts.Common;
 using BANxOpen.Foundation.Contracts.Requirements;
+using BANxOpen.Foundation.Core;
 using BANxOpen.Foundation.Core.Requirements;
 
 namespace BANxOpen.Foundation.NxAdapters.Requirements;
@@ -23,8 +24,14 @@ namespace BANxOpen.Foundation.NxAdapters.Requirements;
 public sealed class NxPartRequirementStore : IPartRequirementStore
 {
     private readonly NxSessionContext _context;
+    private readonly FoundationText _text;
 
-    public NxPartRequirementStore(NxSessionContext context) => _context = context;
+    /// <param name="text">Words the failures a tool shows; <see cref="FoundationText.Default"/> when null.</param>
+    public NxPartRequirementStore(NxSessionContext context, FoundationText? text = null)
+    {
+        _context = context;
+        _text = text ?? FoundationText.Default;
+    }
 
     private Part WorkPart => _context.WorkPart;
 
@@ -38,19 +45,19 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
     {
         var foreign = current.Where(s => s.Domain != domain).Select(RequirementNaming.Name).ToList();
         if (foreign.Count > 0)
-            return OperationResult.Fail("REQUIREMENT_WRONG_DOMAIN", $"Requirements {string.Join(", ", foreign)} do not belong to domain '{domain}'.");
+            return OperationResult.Fail(FoundationCodes.RequirementWrongDomain, _text.RequirementsWrongDomain(foreign, domain));
 
         var (owned, readErrors) = ReadOwned(domain);
         if (readErrors.Count > 0)
         {
             // Never write over what could not be read: an unreadable requirement would look absent and be duplicated,
             // or look unwanted and be deleted without anyone knowing what it said.
-            return OperationResult.Fail("REQUIREMENTS_UNREADABLE", string.Join(" ", readErrors));
+            return OperationResult.Fail(FoundationCodes.RequirementsUnreadable, _text.RequirementsUnreadable(readErrors));
         }
 
-        var diff = RequirementDiff.Compute(owned.Select(o => o.Spec).ToList(), current);
+        var diff = RequirementDiff.Compute(owned.Select(o => o.Spec).ToList(), current, _text);
         if (diff.Errors.Count > 0)
-            return OperationResult.Fail("REQUIREMENT_NAME_CONFLICT", string.Join(" ", diff.Errors));
+            return OperationResult.Fail(FoundationCodes.RequirementNameConflict, _text.RequirementNameConflict(diff.Errors));
 
         var renamed = 0;
         try
@@ -73,7 +80,7 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
         catch (NXException ex)
         {
             _context.Log.Error($"Writing requirements for '{domain}' failed: NX {ex.ErrorCode}: {ex.Message}");
-            return OperationResult.Fail("REQUIREMENT_WRITE_FAILED", $"NX {ex.ErrorCode}: {ex.Message}");
+            return OperationResult.Fail(FoundationCodes.RequirementWriteFailed, _text.RequirementWriteFailed(NxDialogText.Default.NxError(ex)));
         }
 
         if (!diff.IsEmpty || renamed > 0)
@@ -186,7 +193,7 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
         }
         catch (NXException ex)
         {
-            errors.Add($"The part's requirements could not be listed: NX {ex.ErrorCode}: {ex.Message}");
+            errors.Add(_text.RequirementsNotListed(NxDialogText.Default.NxError(ex)));
             return (owned, errors);
         }
 
@@ -203,11 +210,11 @@ public sealed class NxPartRequirementStore : IPartRequirementStore
             }
             catch (NXException ex)
             {
-                errors.Add($"Requirement '{name}' could not be read: NX {ex.ErrorCode}: {ex.Message}");
+                errors.Add(_text.RequirementUnreadable(name, NxDialogText.Default.NxError(ex)));
             }
             catch (FormatException ex)
             {
-                errors.Add($"Requirement '{name}' holds a value that could not be read: {ex.Message}");
+                errors.Add(_text.RequirementValueUnreadable(name, ex.Message));
             }
         }
 

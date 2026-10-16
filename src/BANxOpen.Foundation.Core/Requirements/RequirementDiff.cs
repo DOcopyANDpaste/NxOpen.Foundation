@@ -18,15 +18,15 @@ public sealed record RequirementDiff(
 {
     public bool IsEmpty => ToCreate.Count == 0 && ToReplace.Count == 0 && ToDelete.Count == 0;
 
-    public static RequirementDiff Compute(IReadOnlyList<RequirementSpec> existing, IReadOnlyList<RequirementSpec> wanted)
+    /// <param name="text">Words the name-conflict errors; <see cref="FoundationText.Default"/> when null.</param>
+    public static RequirementDiff Compute(
+        IReadOnlyList<RequirementSpec> existing, IReadOnlyList<RequirementSpec> wanted, FoundationText? text = null)
     {
+        text ??= FoundationText.Default;
         var errors = new List<string>();
 
         foreach (var group in wanted.GroupBy(RequirementNaming.Name, StringComparer.Ordinal).Where(g => g.Count() > 1))
-        {
-            errors.Add($"Requirement name '{group.Key}' is claimed by " +
-                       string.Join(", ", group.Select(s => $"{s.Domain}/{s.Key}/{s.Aspect}")) + ".");
-        }
+            errors.Add(text.RequirementNameClaimed(group.Key, group.Select(s => $"{s.Domain}/{s.Key}/{s.Aspect}")));
 
         if (errors.Count > 0)
         {

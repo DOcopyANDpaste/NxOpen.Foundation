@@ -10,6 +10,7 @@ Baseline patterns for all NXOpen C# code. Read this in every case.
 5. Error handling
 6. Core logic shape
 7. Wiring it together
+8. User-facing text
 
 ---
 
@@ -181,3 +182,58 @@ using (var undo = new UndoScope(session, "Create Block")) {
     undo.Commit();
 }
 ```
+
+## 8. User-facing text
+
+Text the user reads lives with the knowledge that produces it, in one of three layers. Pick the layer by asking
+"who would say this the same way in every tool?"
+
+| Layer | Owns | File |
+|---|---|---|
+| **Domain** (library) | Anything a rule, validator, check or service decides and explains — shared by every UI | One describer per library repo, in its Core project: `FoundationText`, `MaterialsText`, `SheetMetalText`; codes in `FoundationCodes`, `MaterialsCodes`, `SheetMetalCodes` |
+| **Shared NX dialog** | Wording every NX dialog shows the same way, with no domain meaning: message box titles, "could not start", "unexpected error handling …", "NX refused the change", NX error formatting | `BANxOpen.Foundation.NxAdapters/NxDialogText.cs`, used by `NxMessageBoxHelper` |
+| **App** | Only what exists because of this dialog's design: menus, column titles, statuses, flow prompts, dialog-specific errors | The app's `UiText.cs` |
+
+**The contract is the code, not the sentence.** A rule or service returns a stable code (`RuleOutcome.ReasonCode`,
+`OperationResult.ErrorCode`) and the values behind the message (`RuleOutcome.Args`), and builds `Message` from its
+library's describer. `Message` is canonical: every UI shows it as-is and never rewords it.
+
+**Describer pattern** (as ASP.NET Identity's `IdentityErrorDescriber`): an ordinary class with one `public virtual`
+member per message and a `Default` instance. Consumers take it as an optional constructor parameter; factories pass it
+down. No global setter — tests and tools can never step on each other. An app *can* override a wording later by
+subclassing and passing its describer to the factory; by default nobody does.
+
+```csharp
+// BANxOpen.Materials.Core/MaterialsText.cs
+public class MaterialsText {
+    public static MaterialsText Default { get; } = new();
+    public virtual string Reassign(string current, string requested) =>
+        $"Body already has '{current}'. Replace with '{requested}'?";
+}
+
+// BANxOpen.Materials.Core/MaterialsCodes.cs
+public static class MaterialsCodes { public const string Reassign = "REASSIGN"; }
+
+// A rule
+public sealed class RequireConfirmationOnReassignmentRule : IMaterialValidationRule {
+    private readonly MaterialsText _text;
+    public RequireConfirmationOnReassignmentRule(MaterialsText? text = null) => _text = text ?? MaterialsText.Default;
+
+    public RuleOutcome Evaluate(MaterialAssignmentRuleContext c) =>
+        new(RuleId, RuleDecision.RequireConfirmation, MaterialsCodes.Reassign, _text.Reassign(current, requested))
+        { Args = new Dictionary<string, string> { ["current"] = current, ["requested"] = requested } };
+}
+
+// A factory threads it through: MaterialEngine.Create(..., MaterialsText? text = null)
+```
+
+**What goes into a describer:** only text that reaches the user — a message box, or a status line/label shown in a
+dialog. Log lines (Listing Window) stay inline where they are written. An exception whose message reaches the user is
+worded by its library's describer at the throw site; raw NX or system exception text is shown only as a "Details"
+line under a worded sentence (`NxDialogText.NxError(ex)` formats it).
+
+**Never put stored data in a describer.** Text written into the part (attribute values, requirement descriptions) is
+data: changing its wording would make every existing part look changed. Keep it where it is produced, marked as stored.
+
+**Why static C# and not `.resx`:** the toolset is English-only, and typed methods keep placeholders compile-checked.
+Moving to resources later only changes the bodies of the describer methods, not their callers.

@@ -83,6 +83,11 @@ public sealed class MyDialogPresenter {
 
 Core still never sees an NXOpen type. The presenter is the seam.
 
+Text the dialog shows comes from the app's `UiText.cs` (menus, columns, prompts, dialog-specific errors). A message
+from a library — `plan.Message` above, a rule outcome, a failed `OperationResult` — is already worded by that
+library's describer and is shown as-is, never reworded in the presenter. Message boxes go through
+`NxMessageBoxHelper`, whose titles come from `NxDialogText`. See `common.md` §8.
+
 ## 3. BlockAccessor — typed, isolated block access
 
 All `FindBlock("stringID")` lookups and typed property reads live in ONE class, with string IDs as constants. When the Styler regenerates and renames/reorders block fields, only this file changes — the diff is contained and reviewable.
