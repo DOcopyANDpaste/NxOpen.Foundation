@@ -18,7 +18,9 @@ public enum RequirementSeverity
 /// <summary>The comparison a requirement makes. Closed set: these are the two definition methods the tools write.</summary>
 public abstract record RequirementRule;
 
-/// <summary>The checked value must be one of <paramref name="Values"/> — NX's "set of values" definition method.</summary>
+/// <summary>The checked value must be one of <paramref name="Values"/> — NX's "set of values" definition method.
+/// For a <see cref="RequirementValueType.String"/> requirement NX compares the checked expression's value including its
+/// double quotes, so each value must be written quoted (<c>"\"2024-O\""</c>). Values are stored and read back as given.</summary>
 public sealed record SetOfValuesRule(IReadOnlyList<string> Values) : RequirementRule;
 
 /// <summary>The checked value must equal <paramref name="Value"/> within <paramref name="Tolerance"/> — NX's
